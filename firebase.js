@@ -2,9 +2,9 @@
 // Replace these values with your Firebase project config
 const firebaseConfig = {
   apiKey: "your-api-key",
-  authDomain: "your-project.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project.appspot.com",
+  authDomain: "kl-recycling-app-65775308.firebaseapp.com",
+  projectId: "kl-recycling-app-65775308",
+  storageBucket: "kl-recycling-app-65775308.appspot.com",
   messagingSenderId: "123456789",
   appId: "your-app-id"
 };
