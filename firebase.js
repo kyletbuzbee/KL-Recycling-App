@@ -5,7 +5,7 @@ const firebaseConfig = {
   authDomain: "kl-recycling-app-65775308.firebaseapp.com",
   projectId: "kl-recycling-app-65775308",
   storageBucket: "kl-recycling-app-65775308.appspot.com",
-  messagingSenderId: "123456789",
+  messagingSenderId: "194953675577",
   appId: "your-app-id"
 };
 
