@@ -246,47 +246,65 @@ class ServiceCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Service Header with Icon and Title
+          // Service Image Banner
           AppAnimations.fadeIn(
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        Theme.of(context).primaryColor.withOpacity(0.2),
-                        Theme.of(context).primaryColor.withOpacity(0.1),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: AppBorderRadius.mediumBorder,
-                    boxShadow: [AppShadows.small],
+            ClipRRect(
+              borderRadius: AppBorderRadius.mediumBorder,
+              child: Container(
+                height: 160,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withOpacity(0.2),
+                      Theme.of(context).primaryColor.withOpacity(0.1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                   ),
-                  child: Icon(
-                    _getServiceIcon(service['icon'].toString()),
-                    size: 36,
-                    color: Theme.of(context).primaryColor,
+                  borderRadius: AppBorderRadius.mediumBorder,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                    width: 1,
                   ),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    service['name'].toString(),
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.onSurface,
-                      height: 1.3,
-                    ),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface.withOpacity(0.9),
+                          borderRadius: AppBorderRadius.largeBorder,
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.3),
+                            width: 2,
+                          ),
+                        ),
+                        child: Icon(
+                          _getServiceIcon(service['icon'].toString()),
+                          size: 48,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      const Spacer(),
+                      Text(
+                        service['name'].toString(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
             delay: const Duration(milliseconds: 100),
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
 
           // Service Description
           AppAnimations.slideUp(

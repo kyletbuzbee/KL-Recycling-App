@@ -52,119 +52,233 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: AppColors.primary,
+        elevation: 0,
+        title: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(6),
+                child: Image.asset(
+                  AppConstants.logoPath,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.white.withOpacity(0.2),
+                      child: const Icon(
+                        Icons.business,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    );
+                  },
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Text(
+              'K&L Recycling',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.phone, color: Colors.white),
+            onPressed: () => _callBusiness(context),
+            tooltip: 'Call Us',
+          ),
+          const SizedBox(width: 8),
+        ],
+      ),
       backgroundColor: AppColors.background,
       body: AppAnimations.fadeIn(
         CustomScrollView(
           slivers: [
-            // Enhanced Hero Section with Gradient and Animation
+            // Enhanced Hero Section with Image Background and Animation
             SliverToBoxAdapter(
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  gradient: AppGradients.heroBackground,
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(32),
-                    bottomRight: Radius.circular(32),
-                  ),
-                  boxShadow: [AppShadows.medium],
-                ),
-                child: FadeTransition(
-                  opacity: _heroFadeAnimation,
-                  child: SlideTransition(
-                    position: _heroSlideAnimation,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        AppAnimations.scaleIn(
-                          Text(
-                            'Welcome to K&L Recycling',
-                            style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w900,
-                              height: 1.1,
+              child: Stack(
+                children: [
+                  // Hero Image Background
+                  Container(
+                    height: 320,
+                    decoration: BoxDecoration(
+                      gradient: AppGradients.heroBackground,
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(32),
+                        bottomRight: Radius.circular(32),
+                      ),
+                      boxShadow: [AppShadows.medium],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(32),
+                        bottomRight: Radius.circular(32),
+                      ),
+                      child: Stack(
+                        children: [
+                          // Placeholder with icon (can be replaced with real image)
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  AppColors.primary.withOpacity(0.3),
+                                  AppColors.primary.withOpacity(0.1),
+                                ],
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                              ),
                             ),
                           ),
-                          delay: const Duration(milliseconds: 300),
-                        ),
-                        const SizedBox(height: 16),
-                        AppAnimations.slideUp(
-                          Text(
-                            'Your trusted partner for scrap metal recycling and container services in Texas',
-                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: Colors.white.withOpacity(0.9),
-                              height: 1.6,
+                          // Overlay pattern/circuit board effect would go here
+                          Positioned(
+                            right: 20,
+                            bottom: 20,
+                            child: Icon(
+                              Icons.recycling,
+                              size: 120,
+                              color: Colors.white.withOpacity(0.1),
                             ),
                           ),
-                          delay: const Duration(milliseconds: 500),
-                        ),
-                        const SizedBox(height: 32),
-                        AppAnimations.bounceIn(
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: AppGradients.buttonGlow,
-                                    borderRadius: AppBorderRadius.mediumBorder,
-                                    boxShadow: [AppShadows.medium],
-                                  ),
-                                  child: ElevatedButton(
-                                    onPressed: () => _navigateToServices(context),
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.transparent,
-                                      foregroundColor: AppColors.onPrimary,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      elevation: 0,
-                                      shadowColor: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: AppBorderRadius.mediumBorder,
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Explore Services',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 16),
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
-                                    borderRadius: AppBorderRadius.mediumBorder,
-                                  ),
-                                  child: OutlinedButton(
-                                    onPressed: () => _navigateToCamera(context),
-                                    style: OutlinedButton.styleFrom(
-                                      foregroundColor: Colors.white,
-                                      padding: const EdgeInsets.symmetric(vertical: 16),
-                                      side: BorderSide.none,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: AppBorderRadius.mediumBorder,
-                                      ),
-                                    ),
-                                    child: const Text(
-                                      'Get Instant Quote',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          delay: const Duration(milliseconds: 700),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
+
+                  // Content Overlay
+                  Container(
+                    height: 320,
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(32),
+                        bottomRight: Radius.circular(32),
+                      ),
+                    ),
+                    child: FadeTransition(
+                      opacity: _heroFadeAnimation,
+                      child: SlideTransition(
+                        position: _heroSlideAnimation,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            AppAnimations.scaleIn(
+                              Text(
+                                'Welcome to K&L Recycling',
+                                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w900,
+                                  height: 1.1,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 4,
+                                      color: Colors.black.withOpacity(0.3),
+                                      offset: const Offset(1, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              delay: const Duration(milliseconds: 300),
+                            ),
+                            const SizedBox(height: 16),
+                            AppAnimations.slideUp(
+                              Text(
+                                'Your trusted partner for scrap metal recycling and container services in Texas',
+                                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  color: Colors.white.withOpacity(0.95),
+                                  height: 1.6,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 3,
+                                      color: Colors.black.withOpacity(0.2),
+                                      offset: const Offset(0, 1),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              delay: const Duration(milliseconds: 500),
+                            ),
+                            const SizedBox(height: 32),
+                            AppAnimations.bounceIn(
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: AppGradients.buttonGlow,
+                                        borderRadius: AppBorderRadius.mediumBorder,
+                                        boxShadow: [AppShadows.medium],
+                                      ),
+                                      child: ElevatedButton(
+                                        onPressed: () => _navigateToServices(context),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.transparent,
+                                          foregroundColor: AppColors.onPrimary,
+                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          elevation: 0,
+                                          shadowColor: Colors.transparent,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: AppBorderRadius.mediumBorder,
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Explore Services',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 16),
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+                                        borderRadius: AppBorderRadius.mediumBorder,
+                                      ),
+                                      child: OutlinedButton(
+                                        onPressed: () => _navigateToCamera(context),
+                                        style: OutlinedButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(vertical: 16),
+                                          side: BorderSide.none,
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius: AppBorderRadius.mediumBorder,
+                                          ),
+                                        ),
+                                        child: const Text(
+                                          'Get Instant Quote',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              delay: const Duration(milliseconds: 700),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
 

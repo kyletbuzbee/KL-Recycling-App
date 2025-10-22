@@ -68,4 +68,18 @@ class AppConstants {
       'cta': 'Schedule Service'
     }
   ];
-}
+
+  // Image paths
+  static const String logoPath = 'assets/images/logo.png';
+  static const String disaCertificationPath = 'assets/certifications/disa.png';
+  static const String isnCertificationPath = 'assets/certifications/isn-logo.png';
+  static const String remaCertificationPath = 'assets/certifications/ReMa-certified-logo.png';
+
+  // Images from static website (highest impact first)
+  static const String heroImagePath = 'assets/images/hero_facility.jpg';           // 1st - Replace gradient hero
+  static const String facilityExteriorPath = 'assets/images/facility_exterior.jpg'; // 2nd - Contact/about section
+  static const String scrapMetalSamplesPath = 'assets/images/scrap_metal_samples.jpg'; // 3rd - Services page
+  static const String serviceTruckPath = 'assets/images/service_truck.jpg';       // 4th - Services page
+  static const String containerSizesPath = 'assets/images/container_sizes.jpg';   // 5th - Quote forms
+  static const String teamPhotoPath = 'assets/images/team.jpg';                   // 6th - Contact page
+  static const String processWeighingPath = 'assets/images/process_weighing.jpg'; // 7th - Process explanation

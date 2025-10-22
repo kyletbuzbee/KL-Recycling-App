@@ -169,14 +169,14 @@ class AppTheme {
           elevation: 0,
           shadowColor: Colors.transparent,
         ).copyWith(
-          backgroundColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.pressed)) {
+          backgroundColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.pressed)) {
               return AppColors.primaryDark;
             }
             return AppColors.primary;
           }),
-          elevation: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.pressed)) {
+          elevation: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.pressed)) {
               return 4;
             }
             return 2;

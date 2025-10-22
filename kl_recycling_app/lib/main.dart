@@ -9,10 +9,16 @@ import 'package:kl_recycling_app/config/constants.dart';
 import 'package:kl_recycling_app/providers/camera_provider.dart';
 import 'package:kl_recycling_app/services/firebase_service.dart';
 import 'package:kl_recycling_app/models/photo_estimate.dart' as models;
+import 'package:kl_recycling_app/providers/gamification_provider.dart';
 import 'package:kl_recycling_app/screens/services/services_screen.dart';
 import 'package:kl_recycling_app/screens/home_screen.dart';
 import 'package:kl_recycling_app/screens/locations_screen.dart';
 import 'package:kl_recycling_app/screens/contact_screen.dart';
+import 'package:kl_recycling_app/screens/educational_screen.dart';
+import 'package:kl_recycling_app/screens/gamification_screen.dart';
+import 'package:kl_recycling_app/screens/notification_settings_screen.dart';
+import 'package:kl_recycling_app/services/notification_service.dart';
+import 'package:kl_recycling_app/widgets/common/image_placement_guide.dart';
 
 // Platform-specific imports
 import 'package:package_info_plus/package_info_plus.dart';
@@ -35,6 +41,9 @@ void main() async {
   // Initialize other Firebase services
   await FirebaseService.initialize();
 
+  // Initialize notification service
+  await NotificationService.initialize();
+
   // Log app open event
   FirebaseService.logAppOpen();
 
@@ -42,6 +51,7 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CameraProvider()),
+        ChangeNotifierProvider(create: (_) => GamificationProvider()),
       ],
       child: const KLRecyclingApp(),
     ),
@@ -491,8 +501,10 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
     const HomeScreen(),
     const CameraScreen(),
     const ServicesScreen(),
-    const LocationsScreen(),
-    const ContactScreen(),
+    const EducationalScreen(),
+    const GamificationScreen(),
+    // const LocationsScreen(),
+    // const ContactScreen(),
   ];
 
   void _onTabTapped(int index) {
@@ -534,14 +546,14 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
               label: 'Services',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.location_on_outlined),
-              activeIcon: Icon(Icons.location_on),
-              label: 'Locations',
+              icon: Icon(Icons.school_outlined),
+              activeIcon: Icon(Icons.school),
+              label: 'Learn',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.phone_outlined),
-              activeIcon: Icon(Icons.phone),
-              label: 'Contact',
+              icon: Icon(Icons.emoji_events_outlined),
+              activeIcon: Icon(Icons.emoji_events),
+              label: 'Impact',
             ),
           ],
         ),

@@ -320,6 +320,54 @@ class _ContactScreenState extends State<ContactScreen> {
 
             const SizedBox(height: 32),
 
+            // Certifications Section
+            CustomCard(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Our Certifications & Licenses',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    'Licensed, insured, and committed to professional service standards.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _CertificationBadge(
+                        imagePath: AppConstants.disaCertificationPath,
+                        label: 'DISA Certified',
+                        size: 60,
+                      ),
+                      _CertificationBadge(
+                        imagePath: AppConstants.isnCertificationPath,
+                        label: 'ISN Member',
+                        size: 60,
+                      ),
+                      _CertificationBadge(
+                        imagePath: AppConstants.remaCertificationPath,
+                        label: 'ReMA Certified',
+                        size: 60,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 32),
+
             // Frequently Asked Questions
             CustomCard(
               padding: const EdgeInsets.all(24),
@@ -501,6 +549,64 @@ class _FAQItem extends StatelessWidget {
             fontSize: 14,
             color: Colors.grey[600],
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CertificationBadge extends StatelessWidget {
+  final String imagePath;
+  final String label;
+  final double size;
+
+  const _CertificationBadge({
+    required this.imagePath,
+    required this.label,
+    this.size = 60,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: Colors.grey.shade300,
+              width: 1,
+            ),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(7),
+            child: Image.asset(
+              imagePath,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: Colors.grey.shade100,
+                  child: Icon(
+                    Icons.business,
+                    color: AppColors.primary,
+                    size: size * 0.4,
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.onSurface,
+          ),
+          textAlign: TextAlign.center,
         ),
       ],
     );
