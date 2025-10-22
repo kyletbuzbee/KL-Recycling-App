@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Requires Wear OS -->
+    <uses-feature android:name="android.hardware.type.watch" />
+
+    <application>
+        <!-- Indicates that this app is compatible with wearable devices -->
+        <uses-library
+            android:name="com.google.android.wearable"
+            android:required="false" />
+
+        <!-- Needed for Firebase on Wear OS -->
+        <uses-permission android:name="android.permission.WAKE_LOCK" />
+    </application>
+
+</manifest>

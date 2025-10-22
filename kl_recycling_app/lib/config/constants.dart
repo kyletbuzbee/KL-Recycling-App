@@ -30,36 +30,42 @@ class AppConstants {
       'name': 'Roll-Off Containers',
       'description': 'Flexible container rental services',
       'icon': 'truck',
+      'category': 'general', // Match filter logic in services screen
       'sizes': ['20 yd', '30 yd', '40 yd'],
       'features': [
         'Same-day delivery',
         'GPS-tracked containers',
         'Flexible rental terms'
-      ]
+      ],
+      'cta': 'Get Container Quote'
     },
     {
       'id': 'scrap-metal-pickup',
       'name': 'Scrap Metal Pickup',
       'description': 'Professional scrap metal collection',
       'icon': 'recycle',
+      'category': 'general', // This should appear in General tab
       'materials': ['Steel', 'Aluminum', 'Copper', 'Brass'],
       'features': [
         'High-grade payments',
         'Digital weighing',
         'Tax form processing'
-      ]
+      ],
+      'cta': 'Request Pickup'
     },
     {
       'id': 'container-service',
       'name': 'Container Service',
       'description': 'Temporary and permanent bins',
       'icon': 'container',
+      'category': 'equipment', // Equipment category
       'sizes': ['2 yd', '4 yd', '6 yd', '8 yd'],
       'features': [
         'Weekly service',
         'Flexible scheduling',
         'Lid credits'
-      ]
+      ],
+      'cta': 'Schedule Service'
     }
   ];
 }

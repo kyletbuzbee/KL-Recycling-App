@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "671957589313",
+    "project_id": "gen-lang-client-0541313854",
+    "storage_bucket": "gen-lang-client-0541313854.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:671957589313:android:a210ed222ebec19600d5c0",
+        "android_client_info": {
+          "package_name": "com.klrecycling.android.tv"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBrE_Z_1HlaTV_nzSFiDwdqTw4U5SN_pOM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,14 +2,41 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
-import 'package:geolocator/geolocator.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:kl_recycling_app/firebase_options.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/config/constants.dart';
 import 'package:kl_recycling_app/providers/camera_provider.dart';
+import 'package:kl_recycling_app/services/firebase_service.dart';
 import 'package:kl_recycling_app/models/photo_estimate.dart' as models;
+import 'package:kl_recycling_app/screens/services/services_screen.dart';
+import 'package:kl_recycling_app/screens/home_screen.dart';
+import 'package:kl_recycling_app/screens/locations_screen.dart';
+import 'package:kl_recycling_app/screens/contact_screen.dart';
+
+// Platform-specific imports
+import 'package:package_info_plus/package_info_plus.dart';
+
+// Platform type enumeration
+enum PlatformVariant {
+  mobile,
+  wear,
+  tv,
+}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  // Initialize other Firebase services
+  await FirebaseService.initialize();
+
+  // Log app open event
+  FirebaseService.logAppOpen();
 
   runApp(
     MultiProvider(
@@ -19,28 +46,6 @@ void main() async {
       child: const KLRecyclingApp(),
     ),
   );
-}
-
-class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('K&L Recycling'),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-      ),
-      body: const Center(
-        child: Text(
-          'Welcome to K&L Recycling\nHome Screen Coming Soon',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 18),
-        ),
-      ),
-    );
-  }
 }
 
 class CameraScreen extends StatefulWidget {
@@ -423,14 +428,71 @@ class KLRecyclingApp extends StatefulWidget {
 }
 
 class _KLRecyclingAppState extends State<KLRecyclingApp> {
+  PlatformVariant? _platformVariant;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePlatformDetection();
+  }
+
+  Future<void> _initializePlatformDetection() async {
+    final packageInfo = await PackageInfo.fromPlatform();
+    final packageName = packageInfo.packageName;
+
+    PlatformVariant variant;
+    if (packageName.contains('wear')) {
+      variant = PlatformVariant.wear;
+    } else if (packageName.contains('tv')) {
+      variant = PlatformVariant.tv;
+    } else {
+      variant = PlatformVariant.mobile;
+    }
+
+    setState(() {
+      _platformVariant = variant;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_platformVariant == null) {
+      return const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
+    switch (_platformVariant!) {
+      case PlatformVariant.mobile:
+        return const MobileRecyclingApp();
+      case PlatformVariant.wear:
+        return const WearRecyclingApp();
+      case PlatformVariant.tv:
+        return const TvRecyclingApp();
+    }
+  }
+}
+
+// Mobile app - full featured
+class MobileRecyclingApp extends StatefulWidget {
+  const MobileRecyclingApp({super.key});
+
+  @override
+  State<MobileRecyclingApp> createState() => _MobileRecyclingAppState();
+}
+
+class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
   int _currentIndex = 0;
 
   final List<Widget> _screens = [
     const HomeScreen(),
     const CameraScreen(),
-    const Placeholder(), // Services placeholder
-    const Placeholder(), // Locations placeholder
-    const Placeholder(), // Contact placeholder
+    const ServicesScreen(),
+    const LocationsScreen(),
+    const ContactScreen(),
   ];
 
   void _onTabTapped(int index) {
@@ -465,6 +527,203 @@ class _KLRecyclingAppState extends State<KLRecyclingApp> {
               icon: Icon(Icons.camera_alt_outlined),
               activeIcon: Icon(Icons.camera_alt),
               label: 'Camera',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.build_outlined),
+              activeIcon: Icon(Icons.build),
+              label: 'Services',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.location_on_outlined),
+              activeIcon: Icon(Icons.location_on),
+              label: 'Locations',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.phone_outlined),
+              activeIcon: Icon(Icons.phone),
+              label: 'Contact',
+            ),
+          ],
+        ),
+      ),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// Wear-specific home screen - simplified for watch display
+class WearHomeScreen extends StatelessWidget {
+  const WearHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('KL Recycling'),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        toolbarHeight: 40,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Quick action buttons for wear
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  WearActionButton(
+                    icon: Icons.local_shipping,
+                    label: 'Container Quote',
+                    onTap: () => _navigateToServices(context),
+                  ),
+                  const SizedBox(height: 16),
+                  WearActionButton(
+                    icon: Icons.recycling,
+                    label: 'Scrap Pickup',
+                    onTap: () => _navigateToScrapPickup(context),
+                  ),
+                  const SizedBox(height: 16),
+                  WearActionButton(
+                    icon: Icons.phone,
+                    label: 'Call Us',
+                    onTap: () => _callBusiness(context),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _navigateToServices(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Container quote available - check mobile app')),
+    );
+  }
+
+  void _navigateToScrapPickup(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Scrap pickup available - check mobile app')),
+    );
+  }
+
+  void _callBusiness(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Call ${AppConstants.phoneNumber}')),
+    );
+  }
+}
+
+// Simplified button for wear OS
+class WearActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  const WearActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: AppColors.primary, size: 24),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: const TextStyle(
+                color: AppColors.primary,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// Wear OS app - simplified for watches
+class WearRecyclingApp extends StatelessWidget {
+  const WearRecyclingApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '${AppConstants.appName} - Wear',
+      theme: AppTheme.lightTheme,
+      home: const WearHomeScreen(),
+      debugShowCheckedModeBanner: false,
+    );
+  }
+}
+
+// Android TV app - focusable navigation
+class TvRecyclingApp extends StatefulWidget {
+  const TvRecyclingApp({super.key});
+
+  @override
+  State<TvRecyclingApp> createState() => _TvRecyclingAppState();
+}
+
+class _TvRecyclingAppState extends State<TvRecyclingApp> {
+  int _currentIndex = 0;
+
+  final List<Widget> _screens = [
+    const HomeScreen(),
+    const ServicesScreen(),
+    const LocationsScreen(),
+    const ContactScreen(),
+  ]; // Exclude camera for TV
+
+  void _onTabTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: '${AppConstants.appName} - TV',
+      theme: AppTheme.lightTheme,
+      home: Scaffold(
+        body: _screens[_currentIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: _onTabTapped,
+          backgroundColor: Colors.white,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: true,
+          showUnselectedLabels: true,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_outlined),
+              activeIcon: Icon(Icons.home),
+              label: 'Home',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.build_outlined),

@@ -135,7 +135,7 @@ class CameraProvider with ChangeNotifier {
     try {
       final prefs = await SharedPreferences.getInstance();
       final estimatesJson = _estimates
-          .map((estimate) => estimate != null ? jsonEncode(estimate.toJson()) : null)
+          .map((estimate) => jsonEncode(estimate.toJson()))
           .where((json) => json != null)
           .cast<String>()
           .toList();

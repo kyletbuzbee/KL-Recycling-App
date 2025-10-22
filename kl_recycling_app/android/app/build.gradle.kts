@@ -3,6 +3,7 @@ plugins {
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -21,13 +22,32 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.kl_recycling_app"
+        applicationId = "com.klrecycling.android"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    flavorDimensions += "platform"
+
+    productFlavors {
+        create("mobile") {
+            dimension = "platform"
+            applicationId = "com.klrecycling.android"
+        }
+        create("wear") {
+            dimension = "platform"
+            applicationId = "com.klrecycling.android.wear"
+            minSdk = flutter.minSdkVersion
+        }
+        create("tv") {
+            dimension = "platform"
+            applicationId = "com.klrecycling.android.tv"
+            minSdk = flutter.minSdkVersion
+        }
     }
 
     buildTypes {
