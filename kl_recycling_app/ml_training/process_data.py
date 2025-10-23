@@ -174,7 +174,7 @@ class ScrapMetalDataProcessor:
             # Create label file
             label_file = img_dest.with_suffix('.txt')
             with open(label_file, 'w') as f:
-                f.write(row['bbox_data'] + '\\n')
+                f.write(row['bbox_data'] + '\n')
 
     def _create_data_yaml(self):
         """Create YOLO data configuration."""
