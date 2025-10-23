@@ -55,10 +55,10 @@ dependencies:
   # UI Enhancements
   url_launcher: ^6.1.12
   shimmer: ^3.0.0
-  firebase_core: ^4.2.0
-  firebase_analytics: ^12.0.3
-  firebase_messaging: ^16.0.3
-  firebase_storage: ^13.0.3
+  firebase_core: ^2.32.0
+  firebase_analytics: ^10.0.0
+  firebase_messaging: ^14.0.0
+  firebase_storage: ^11.0.0
 
   # Notifications
   flutter_local_notifications: ^17.2.2
@@ -72,8 +72,16 @@ dependencies:
   rxdart: ^0.28.0
   scroll_to_index: ^3.0.1
 
+  # Charts and Data Visualization
+  fl_chart: ^0.68.0
+  syncfusion_flutter_charts: ^25.2.3
+
   # Platform-specific plugins
   package_info_plus: ^8.0.0
+
+  # ML/AI - TensorFlow Lite for enhanced scrap metal detection
+  tflite_flutter: ^0.11.0
+  image: ^4.1.3
 
 dev_dependencies:
   flutter_test:
@@ -102,6 +110,8 @@ flutter:
     - assets/images/
     - assets/lottie/
     - assets/certifications/
+    - assets/models/
+    - assets/data/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -58,27 +58,38 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         title: Row(
           children: [
             Container(
-              width: 40,
-              height: 40,
+              width: 44,
+              height: 44,
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.white.withOpacity(0.3), width: 1),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
               child: ClipRRect(
-                borderRadius: BorderRadius.circular(6),
-                child: Image.asset(
-                  AppConstants.logoPath,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.white.withOpacity(0.2),
-                      child: const Icon(
-                        Icons.business,
+                borderRadius: BorderRadius.circular(7),
+                child: Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.all(2),
+                  child: Image.asset(
+                    AppConstants.logoPath,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
                         color: Colors.white,
-                        size: 24,
-                      ),
-                    );
-                  },
+                        child: const Icon(
+                          Icons.business,
+                          color: AppColors.primary,
+                          size: 32,
+                        ),
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -194,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             const SizedBox(height: 16),
                             AppAnimations.slideUp(
                               Text(
-                                'Your trusted partner for scrap metal recycling and container services in Texas',
+                                'Leading provider of mobile car crushing, oil & gas demolition, roll-off containers, and public recycling drop-off locations in Texas',
                                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                                   color: Colors.white.withOpacity(0.95),
                                   height: 1.6,
@@ -260,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           ),
                                         ),
                                         child: const Text(
-                                          'Get Instant Quote',
+                                          'Estimate Weight',
                                           style: TextStyle(
                                             fontSize: 16,
                                             fontWeight: FontWeight.w700,
@@ -336,11 +347,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Expanded(
                             child: AppAnimations.rotateIn(
                               _AnimatedQuickActionCard(
-                                icon: Icons.recycling,
-                                label: 'Scrap Pickup',
-                                backgroundColor: AppColors.warning.withOpacity(0.1),
-                                iconColor: AppColors.warning,
-                                onTap: () => _navigateToScrapPickup(context),
+                                icon: Icons.phone,
+                                label: 'Call Us',
+                                backgroundColor: AppColors.primaryLight.withOpacity(0.1),
+                                iconColor: AppColors.primary,
+                                onTap: () => _callBusiness(context),
                               ),
                               delay: const Duration(milliseconds: 1200),
                             ),
@@ -349,11 +360,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Expanded(
                             child: AppAnimations.rotateIn(
                               _AnimatedQuickActionCard(
-                                icon: Icons.phone,
-                                label: 'Call Us',
-                                backgroundColor: AppColors.primaryLight.withOpacity(0.1),
-                                iconColor: AppColors.primary,
-                                onTap: () => _callBusiness(context),
+                                icon: Icons.location_on,
+                                label: 'Locations',
+                                backgroundColor: AppColors.info.withOpacity(0.1),
+                                iconColor: AppColors.info,
+                                onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Locations screen coming soon')),
+                                ),
                               ),
                               delay: const Duration(milliseconds: 1300),
                             ),
@@ -412,8 +425,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           _EnhancedFeatureCard(
                             icon: Icons.eco,
                             title: 'Environmental Impact',
-                            description: 'Supporting sustainable recycling practices that benefit our community.',
-                            color: AppColors.warning,
+                            description: 'Metal recycling reduces landfill waste and conserves natural resources.',
+                            color: Colors.green[700]!,
                             animationDelay: const Duration(milliseconds: 1800),
                           ),
                         ],
@@ -602,12 +615,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _navigateToScrapPickup(BuildContext context) {
-    // This would navigate to scrap pickup form
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Scrap pickup available in Services')),
-    );
-  }
+
 
   void _callBusiness(BuildContext context) {
     // For web implementation, show contact info

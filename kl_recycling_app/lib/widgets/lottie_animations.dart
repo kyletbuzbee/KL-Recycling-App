@@ -12,8 +12,7 @@ class LottieAnimations {
     Duration duration = const Duration(seconds: 2),
     VoidCallback? onComplete,
   }) async {
-    OverlayEntry? overlayEntry;
-
+    late final OverlayEntry overlayEntry;
     overlayEntry = OverlayEntry(
       builder: (context) => Material(
         color: Colors.black.withOpacity(0.3),
@@ -23,7 +22,7 @@ class LottieAnimations {
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: AppBorderRadius.extraLargeBorder,
-              boxShadow: AppShadows.floating,
+              boxShadow: [AppShadows.floating],
             ),
             child: Lottie.asset(
               _successCheckPath,
@@ -32,7 +31,7 @@ class LottieAnimations {
               repeat: false,
               onLoaded: (composition) {
                 Future.delayed(duration, () {
-                  overlayEntry?.remove();
+                  overlayEntry.remove();
                   onComplete?.call();
                 });
               },
@@ -114,7 +113,7 @@ class LottieAnimations {
                   decoration: BoxDecoration(
                     gradient: AppGradients.primary,
                     borderRadius: AppBorderRadius.largeBorder,
-                    boxShadow: AppShadows.large,
+                    boxShadow: [AppShadows.large],
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -156,7 +155,8 @@ class LottieAnimations {
     required IconData icon,
     required Color color,
   }) async {
-    final overlayEntry = OverlayEntry(
+    late final OverlayEntry overlayEntry;
+    overlayEntry = OverlayEntry(
       builder: (context) => SlideTransition(
         position: Tween<Offset>(
           begin: const Offset(0, -1),
@@ -182,7 +182,7 @@ class LottieAnimations {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: AppBorderRadius.largeBorder,
-                  boxShadow: AppShadows.floating,
+                  boxShadow: [AppShadows.floating],
                 ),
                 child: Row(
                   children: [
@@ -248,7 +248,7 @@ class LottieAnimations {
     }
   }
 
-  /// Environmental impact visualization animation
+/// Environmental impact visualization animation
   static Widget impactVisualization({
     required String impactType, // "trees", "energy", "co2"
     required int value,
@@ -281,7 +281,7 @@ class LottieAnimations {
       decoration: BoxDecoration(
         gradient: AppGradients.primary,
         borderRadius: BorderRadius.circular(size / 2),
-        boxShadow: AppShadows.medium,
+        boxShadow: [AppShadows.medium],
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -312,7 +312,9 @@ class LottieAnimations {
       ),
     );
   }
-/// Badge celebration widget for unlock animations
+}
+
+//// Badge celebration widget for unlock animations
 class _BadgeCelebrationWidget extends StatefulWidget {
   final String badgeTitle;
   final IconData badgeIcon;
@@ -429,9 +431,9 @@ extension LottieExtensions on Widget {
     Duration duration = const Duration(seconds: 2),
   }) {
     return _CelebrationWrapper(
-      child: this,
       message: message,
       duration: duration,
+      child: this,
     );
   }
 }
@@ -443,7 +445,7 @@ class _CelebrationWrapper extends StatefulWidget {
 
   const _CelebrationWrapper({
     required this.child,
-    required this.message = 'Amazing!',
+    this.message = 'Amazing!',
     this.duration = const Duration(seconds: 2),
   });
 

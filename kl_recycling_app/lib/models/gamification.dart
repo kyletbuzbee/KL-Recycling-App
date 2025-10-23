@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:uuid/uuid.dart';
+import 'package:kl_recycling_app/models/photo_estimate.dart' as photo_estimate;
+
+// Type aliases for compatibility
+typedef RecyclingItem = RecycledItem;
+typedef GamificationStats = UserGamificationStats;
+typedef MaterialType = photo_estimate.MaterialType;
 
 enum BadgeType {
   firstRecycle('First Recycle', 'Awarded for your first recycling activity', Icons.recycling, 1),

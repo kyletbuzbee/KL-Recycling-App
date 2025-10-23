@@ -23,7 +23,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -69,6 +69,10 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
               text: 'History',
               icon: Icon(Icons.history),
             ),
+            Tab(
+              text: 'Analytics',
+              icon: Icon(Icons.analytics),
+            ),
           ],
         ),
       ),
@@ -78,6 +82,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
         children: [
           _buildDashboardTab(gamificationProvider),
           _buildHistoryTab(gamificationProvider),
+          _buildAnalyticsTab(gamificationProvider),
         ],
       ),
     );
@@ -126,7 +131,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
               AppAnimations.bounceIn(
                 ElevatedButton(
                   onPressed: () async {
-                    await provider.simulateDemoData();
+                    provider.simulateDemoData();
 
                     // Show badge unlock animation after a delay
                     await Future.delayed(const Duration(seconds: 1));
@@ -412,6 +417,314 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
     );
   }
 
+  Widget _buildAnalyticsTab(GamificationProvider provider) {
+    final stats = provider.stats;
+
+    return AppAnimations.fadeIn(
+      Padding(
+        padding: const EdgeInsets.all(16),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title
+              AppAnimations.scaleIn(
+                Text(
+                  'Detailed Analytics',
+                  style: Theme.of(context).textTheme.headlineLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: AppColors.onSurface,
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Environmental Impact Section
+              CustomCard(
+                color: AppColors.surface,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.eco, color: AppColors.success, size: 28),
+                          const SizedBox(width: 12),
+                          Text(
+                            'Environmental Savings',
+                            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onSurface,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+
+                      // Impact metrics
+                      if (stats.totalItems > 0) ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _AnalyticsMetricCard(
+                                title: 'Energy Saved',
+                                value: '≈${(stats.totalWeight * 8).toStringAsFixed(0)} kWh',
+                                subtitle: 'Equivalent to ~${(stats.totalWeight * 8 / 10).toStringAsFixed(0)} lightbulbs',
+                                icon: Icons.flash_on,
+                                color: AppColors.warning,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _AnalyticsMetricCard(
+                                title: 'CO₂ Reduced',
+                                value: '≈${(stats.totalWeight * 2.5).toStringAsFixed(0)} kg',
+                                subtitle: 'Equivalent to ~${(stats.totalWeight * 2.5 / 0.2).toStringAsFixed(0)} miles driven',
+                                icon: Icons.cloud_off,
+                                color: AppColors.success,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _AnalyticsMetricCard(
+                          title: 'Trees Saved',
+                          value: '≈${(stats.totalItems / 17).toStringAsFixed(1)} trees',
+                          subtitle: 'Based on paper and cardboard recycling',
+                          icon: Icons.park,
+                          color: AppColors.info,
+                          isFullWidth: true,
+                        ),
+                      ] else
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.analytics_outlined,
+                                size: 64,
+                                color: AppColors.onSurfaceSecondary.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Start recycling to see your detailed impact!',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.onSurfaceSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Material Distribution
+              if (stats.materialTotals.isNotEmpty) ...[
+                CustomCard(
+                  color: AppColors.surface,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Material Distribution',
+                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        ...stats.materialTotals.entries.map((entry) {
+                          final totalWeight = stats.materialTotals.values.reduce((a, b) => a + b);
+                          final percentage = (entry.value / totalWeight * 100).toStringAsFixed(1);
+
+                          return Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 12,
+                                  height: 12,
+                                  decoration: BoxDecoration(
+                                    color: _getMaterialColor(entry.key),
+                                    borderRadius: BorderRadius.circular(2),
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    entry.key,
+                                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  '${entry.value.toStringAsFixed(1)} lbs ($percentage%)',
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.onSurfaceSecondary,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        }),
+                      ],
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+              ],
+
+              // Activity Insights
+              CustomCard(
+                color: AppColors.surface,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Activity Insights',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+
+                      if (stats.recyclingHistory.isEmpty) ...[
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                Icons.insights,
+                                size: 48,
+                                color: AppColors.onSurfaceSecondary.withOpacity(0.5),
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Your activity patterns will appear here',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: AppColors.onSurfaceSecondary,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ] else ...[
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _AnalyticsMetricCard(
+                                title: 'Avg Points/Day',
+                                value: (stats.totalPoints / _calculateActiveDays(stats.recyclingHistory)).toStringAsFixed(1),
+                                subtitle: 'Over ${stats.recyclingHistory.length} activities',
+                                icon: Icons.star,
+                                color: AppColors.success,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _AnalyticsMetricCard(
+                                title: 'Avg Weight/Day',
+                                value: '${(stats.totalWeight / _calculateActiveDays(stats.recyclingHistory)).toStringAsFixed(1)} lbs',
+                                subtitle: 'Consistent recycling habits',
+                                icon: Icons.scale,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 16),
+                        _AnalyticsMetricCard(
+                          title: 'Most Active Material',
+                          value: _getMostActiveMaterial(stats),
+                          subtitle: 'Your primary contribution',
+                          icon: Icons.leaderboard,
+                          color: AppColors.secondary,
+                          isFullWidth: true,
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+
+              // Educational note
+              CustomCard(
+                color: AppColors.info.withOpacity(0.1),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        Icons.info_outline,
+                        color: AppColors.info,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          'Environmental estimates are calculated using industry-standard recycling impact factors. Your actions are making a real difference!',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.info,
+                            height: 1.4,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  int _calculateActiveDays(List<gamification.RecycledItem> history) {
+    if (history.isEmpty) return 1;
+
+    // Get unique dates
+    final dates = history.map((item) => item.recycledDate.toIso8601String().split('T')[0]).toSet();
+    return dates.length.clamp(1, 999);
+  }
+
+  String _getMostActiveMaterial(gamification.UserGamificationStats stats) {
+    if (stats.materialTotals.isEmpty) return 'None';
+
+    final entry = stats.materialTotals.entries.reduce((a, b) => a.value > b.value ? a : b);
+    return '${entry.key} (${entry.value.toStringAsFixed(1)} lbs)';
+  }
+
+  Color _getMaterialColor(String material) {
+    const colors = {
+      'aluminum': AppColors.secondary,
+      'steel': AppColors.onSurfaceSecondary,
+      'paper': AppColors.warning,
+      'plastic': AppColors.primary,
+      'cardboard': AppColors.warning,
+      'glass': AppColors.info,
+      'copper': AppColors.secondary,
+      'electronics': AppColors.primary,
+    };
+    return colors[material.toLowerCase()] ?? AppColors.onSurfaceSecondary;
+  }
+
   String _formatDate(DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
@@ -561,6 +874,136 @@ class _BadgeCard extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+// Helper widgets for analytics
+class _AnalyticsMetricCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+  final bool isFullWidth;
+
+  const _AnalyticsMetricCard({
+    required this.title,
+    required this.value,
+    required this.subtitle,
+    required this.icon,
+    required this.color,
+    this.isFullWidth = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final card = Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: AppBorderRadius.mediumBorder,
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  icon,
+                  size: 20,
+                  color: color,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      value,
+                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: color,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.onSurfaceSecondary,
+            ),
+          ),
+        ],
+      ),
+    );
+
+    return isFullWidth ? card : ConstrainedBox(
+      constraints: const BoxConstraints(minHeight: 120),
+      child: card,
+    );
+  }
+}
+
+// Helper animation card for badges
+class AnimatedCard extends StatefulWidget {
+  final Widget child;
+  const AnimatedCard({super.key, required this.child});
+
+  @override
+  State<AnimatedCard> createState() => _AnimatedCardState();
+}
+
+class _AnimatedCardState extends State<AnimatedCard> with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 0.95, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.elasticOut),
+    );
+    _animationController.forward();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _scaleAnimation,
+      builder: (context, child) => Transform.scale(
+        scale: _scaleAnimation.value,
+        child: widget.child,
       ),
     );
   }

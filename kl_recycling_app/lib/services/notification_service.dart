@@ -185,8 +185,6 @@ class NotificationService {
     required String title,
     required String body,
     String? payload,
-    Importance importance = Importance.defaultImportance,
-    Priority priority = Priority.defaultPriority,
   }) async {
     const androidDetails = AndroidNotificationDetails(
       'kl_recycling_channel',

@@ -4,8 +4,6 @@ import 'package:kl_recycling_app/config/animations.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
 import 'package:kl_recycling_app/screens/forms/container_quote_form.dart';
-import 'package:kl_recycling_app/screens/forms/scrap_pickup_form.dart';
-import 'package:kl_recycling_app/screens/forms/container_service_form.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -21,7 +19,7 @@ class _ServicesScreenState extends State<ServicesScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -35,7 +33,7 @@ class _ServicesScreenState extends State<ServicesScreen>
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Our Services',
+          'Metal Recycling Services',
           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
             fontWeight: FontWeight.w800,
             color: AppColors.onPrimary,
@@ -73,12 +71,6 @@ class _ServicesScreenState extends State<ServicesScreen>
                     style: TextStyle(fontWeight: FontWeight.w600),
                   ),
                 ),
-                Tab(
-                  child: Text(
-                    'Equipment',
-                    style: TextStyle(fontWeight: FontWeight.w600),
-                  ),
-                ),
               ],
               indicatorColor: AppColors.primary,
               labelColor: AppColors.primary,
@@ -99,7 +91,6 @@ class _ServicesScreenState extends State<ServicesScreen>
           children: const [
             GeneralServicesTab(),
             SpecializedServicesTab(),
-            EquipmentServicesTab(),
           ],
         ),
       ),
@@ -462,6 +453,8 @@ class ServiceCard extends StatelessWidget {
         return Icons.recycling;
       case 'container':
         return Icons.inventory_2;
+      case 'location':
+        return Icons.location_on;
       default:
         return Icons.build;
     }
@@ -480,21 +473,15 @@ class ServiceCard extends StatelessWidget {
           builder: (context) => ContainerQuoteForm(containerType: serviceName),
         ),
       );
-    } else if (serviceId == 'scrap-metal-pickup') {
-      // Navigate to scrap pickup form
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const ScrapPickupForm(),
-        ),
+    } else if (serviceId == 'mobile-car-crushing' || serviceId == 'oil-gas-demo') {
+      // Contact for service request or quote
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Call us to schedule $serviceName - ${AppConstants.phoneNumber}')),
       );
-    } else if (serviceId == 'container-service') {
-      // Navigate to container service form
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ContainerServiceForm(serviceType: serviceName),
-        ),
+    } else if (serviceId == 'public-drop-off') {
+      // Navigate to locations (coming soon)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location information coming soon!')),
       );
     } else {
       // Fallback for other services

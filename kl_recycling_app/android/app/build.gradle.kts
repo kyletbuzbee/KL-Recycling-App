@@ -14,6 +14,7 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlinOptions {
@@ -31,34 +32,22 @@ android {
         versionName = flutter.versionName
     }
 
-    flavorDimensions += "platform"
-
-    productFlavors {
-        create("mobile") {
-            dimension = "platform"
-            applicationId = "com.klrecycling.android"
-        }
-        create("wear") {
-            dimension = "platform"
-            applicationId = "com.klrecycling.android.wear"
-            minSdk = flutter.minSdkVersion
-        }
-        create("tv") {
-            dimension = "platform"
-            applicationId = "com.klrecycling.android.tv"
-            minSdk = flutter.minSdkVersion
-        }
-    }
-
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+            isMinifyEnabled = false  // Temporarily disabled for debugging
+            isShrinkResources = false  // Must be false when minifyEnabled is false
+            // proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 }
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.2.2")
 }

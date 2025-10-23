@@ -4,8 +4,8 @@ class AppConstants {
   static const String version = '1.0.0';
 
   // Business Information
-  static const String phoneNumber = '903-217-4260';
-  static const String email = 'info@klrecyclingaz.com';
+  static const String phoneNumber = '(903) 592-6299';
+  static const String email = 'info@kl-recycling.com';
   static const String websiteUrl = 'https://klrecyclingaz.com';
   static const String address = 'Tyler, Texas';
   static const double businessLat = 32.3519;
@@ -26,10 +26,36 @@ class AppConstants {
   // Services
   static const List<Map<String, dynamic>> services = [
     {
+      'id': 'mobile-car-crushing',
+      'name': 'Mobile Car Crushing',
+      'description': 'On-site vehicle crushing services',
+      'icon': 'truck',
+      'category': 'specialized',
+      'features': [
+        'Mobile crushing equipment',
+        'On-site service available',
+        'Competitive pricing'
+      ],
+      'cta': 'Request Service'
+    },
+    {
+      'id': 'oil-gas-demo',
+      'name': 'Oil & Gas Demo',
+      'description': 'Equipment demolition and recycling',
+      'icon': 'recycle',
+      'category': 'specialized',
+      'features': [
+        'Heavy equipment dismantling',
+        'Hazardous materials handling',
+        'Permitted and insured'
+      ],
+      'cta': 'Get Quote'
+    },
+    {
       'id': 'roll-off-containers',
       'name': 'Roll-Off Containers',
       'description': 'Flexible container rental services',
-      'icon': 'truck',
+      'icon': 'container',
       'category': 'general', // Match filter logic in services screen
       'sizes': ['20 yd', '30 yd', '40 yd'],
       'features': [
@@ -40,32 +66,17 @@ class AppConstants {
       'cta': 'Get Container Quote'
     },
     {
-      'id': 'scrap-metal-pickup',
-      'name': 'Scrap Metal Pickup',
-      'description': 'Professional scrap metal collection',
-      'icon': 'recycle',
-      'category': 'general', // This should appear in General tab
-      'materials': ['Steel', 'Aluminum', 'Copper', 'Brass'],
+      'id': 'public-drop-off',
+      'name': 'Public Drop-Off Locations',
+      'description': 'Convenient recycling drop-off sites',
+      'icon': 'location',
+      'category': 'general',
       'features': [
-        'High-grade payments',
-        'Digital weighing',
-        'Tax form processing'
+        'Multiple locations',
+        '24/7 access at select sites',
+        'All materials accepted'
       ],
-      'cta': 'Request Pickup'
-    },
-    {
-      'id': 'container-service',
-      'name': 'Container Service',
-      'description': 'Temporary and permanent bins',
-      'icon': 'container',
-      'category': 'equipment', // Equipment category
-      'sizes': ['2 yd', '4 yd', '6 yd', '8 yd'],
-      'features': [
-        'Weekly service',
-        'Flexible scheduling',
-        'Lid credits'
-      ],
-      'cta': 'Schedule Service'
+      'cta': 'Find Location'
     }
   ];
 
@@ -83,3 +94,4 @@ class AppConstants {
   static const String containerSizesPath = 'assets/images/container_sizes.jpg';   // 5th - Quote forms
   static const String teamPhotoPath = 'assets/images/team.jpg';                   // 6th - Contact page
   static const String processWeighingPath = 'assets/images/process_weighing.jpg'; // 7th - Process explanation
+}

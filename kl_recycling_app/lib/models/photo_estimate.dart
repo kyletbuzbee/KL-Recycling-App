@@ -9,6 +9,13 @@ enum MaterialType {
   unknown
 }
 
+enum PhotoQuality {
+  poor,
+  fair,
+  good,
+  excellent,
+}
+
 class PhotoEstimate {
   final String id;
   final String imagePath;

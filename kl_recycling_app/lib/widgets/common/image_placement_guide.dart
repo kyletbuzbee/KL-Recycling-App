@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:kl_recycling_app/config/theme.dart';
-import 'package:kl_recycling_app/config/constants.dart';
 
 /// A comprehensive guide showing where static website images should be placed for maximum impact
 class ImagePlacementGuide extends StatelessWidget {

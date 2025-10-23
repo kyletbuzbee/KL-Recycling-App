@@ -29,7 +29,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Learn & Save'),
+        title: const Text('Metal Recycling Facts'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         bottom: TabBar(
@@ -39,12 +39,12 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
           unselectedLabelColor: Colors.white.withOpacity(0.7),
           tabs: const [
             Tab(
-              text: 'Did You Know?',
-              icon: Icon(Icons.lightbulb),
+              text: 'Metal Facts',
+              icon: Icon(Icons.precision_manufacturing),
             ),
             Tab(
-              text: 'Articles',
-              icon: Icon(Icons.article),
+              text: 'Industry Insights',
+              icon: Icon(Icons.business),
             ),
           ],
         ),
@@ -69,7 +69,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
           children: [
             AppAnimations.scaleIn(
               Text(
-                'Fascinating Recycling Facts',
+                'Amazing Metal Recycling Facts',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: AppColors.onSurface,
@@ -79,7 +79,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
             const SizedBox(height: 8),
             AppAnimations.fadeIn(
               Text(
-                'Discover interesting facts about recycling and environmental impact',
+                'Discover the incredible environmental and economic benefits of metal recycling',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.onSurfaceSecondary,
                 ),
@@ -91,34 +91,40 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
               child: ListView(
                 children: [
                   _buildFunFactCard(
-                    'Paper Recycling Impact',
-                    'Recycling one ton of paper can save 17 trees and significantly reduce water and energy consumption in the paper-making process.',
-                    Icons.description,
-                    AppColors.primary,
+                    'Steel Recycling Superpower',
+                    'Recycling steel conserves enough energy to power Los Angeles for 10 days with the steel recycled in just one year. Steel can be recycled infinitely without quality loss.',
+                    Icons.precision_manufacturing,
+                    AppColors.warning,
                   ),
                   _buildFunFactCard(
-                    'Plastic Bottle Facts',
-                    'About 480 billion plastic bottles are sold globally each year, with only 29% collected for recycling. Most end up in landfills or oceans.',
-                    Icons.local_drink,
-                    AppColors.secondary,
-                  ),
-                  _buildFunFactCard(
-                    'Aluminum Recycling',
+                    'Aluminum Energy Giant',
                     'Recycled aluminum saves 95% of the energy required to make new aluminum from raw materials. One recycled can saves enough energy to run a TV for 3 hours.',
                     Icons.build,
                     AppColors.success,
                   ),
                   _buildFunFactCard(
-                    'Steel Recycling Power',
-                    'Recycling steel conserves enough energy to power Los Angeles for 10 days with the steel recycled in one year.',
-                    Icons.precision_manufacturing,
-                    AppColors.warning,
+                    'Copper Forever',
+                    'Copper is 100% recyclable and maintains its properties forever. 40% of all copper consumed worldwide comes from recycled sources. Mining one ton of new copper requires 700 tons of waste material.',
+                    Icons.electrical_services,
+                    Colors.brown,
                   ),
                   _buildFunFactCard(
-                    'Glass Recycling',
-                    'Glass can be recycled endlessly without loss of quality or purity. One glass bottle recycled saves enough energy to power a computer for 25 minutes.',
-                    Icons.liquor,
-                    AppColors.info,
+                    'Iron & Steel Industry Backbone',
+                    'The steel industry recycles more than 400 million tons of iron ore annually. Recycling one ton of steel saves 1,000 pounds of iron ore, 400 pounds of coke, and 120 pounds of limestone.',
+                    Icons.factory,
+                    AppColors.primary,
+                  ),
+                  _buildFunFactCard(
+                    'Metal Mining Impact',
+                    'Metal mining generates 20 billion tons of waste annually. Recycling just one ton of aluminum eliminates nearly 20 tons of mining waste from the environment.',
+                    Icons.terrain,
+                    Colors.deepOrange,
+                  ),
+                  _buildFunFactCard(
+                    'Car Crushing Facts',
+                    'An average car contains about 2,400 pounds of steel and iron. Recycling an end-of-life vehicle recovers 92% of the vehicle by weight, diverting it from landfills.',
+                    Icons.directions_car,
+                    Colors.indigo,
                   ),
                 ],
               ),
@@ -199,7 +205,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
           children: [
             AppAnimations.scaleIn(
               Text(
-                'Waste Reduction Articles',
+                'Metal Recycling Insights',
                 style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                   color: AppColors.onSurface,
@@ -209,7 +215,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
             const SizedBox(height: 8),
             AppAnimations.fadeIn(
               Text(
-                'Learn how to reduce waste and live more sustainably',
+                'Deep dives into the metal recycling industry and sustainable practices',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   color: AppColors.onSurfaceSecondary,
                 ),
@@ -221,25 +227,32 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
               child: ListView(
                 children: [
                   _buildArticleCard(
-                    'Reducing Waste in the Workplace',
-                    'Learn practical strategies to minimize waste generation in office environments.',
-                    Icons.business,
+                    'Understanding Scrap Metal Grades',
+                    'Learn the different grades of scrap metal and how they affect pricing and recycling value.',
+                    Icons.scale,
                     AppColors.primary,
-                    'Reducing waste in the workplace benefits both corporate responsibility and the bottom line. Key strategies include going digital to reduce paper usage, implementing double-sided printing, and establishing electronic document workflows. Partner with certified recycling companies for proper waste sorting and educate employees about the importance of waste reduction. Consider sustainable procurement practices with eco-friendly packaging and products made from recycled content.',
+                    'Scrap metal is categorized into different grades that determine its value and recycling potential. Ferrous metals (containing iron) are divided into grades from #1 to #5, with #1 being the highest quality clean steel. Non-ferrous metals like aluminum, copper, and brass have their own grading systems based on purity and condition. Understanding these grades helps maximize the value you get for your scrap. Factors like contamination, size, and coating significantly affect grading. Professional metal recyclers use sophisticated separation techniques to ensure accurate grading and maximize recycling efficiency.',
                   ),
                   _buildArticleCard(
-                    'Home Composting Basics',
-                    'Start your composting journey at home and turn kitchen scraps into nutrient-rich soil.',
-                    Icons.eco,
+                    'Mobile Car Crushing Technology',
+                    'How modern car crushers are revolutionizing the end-of-life vehicle recycling industry.',
+                    Icons.directions_car,
+                    Colors.indigo,
+                    'Mobile car crushing technology has transformed automotive recycling with advanced hydraulic systems capable of crushing vehicles in under 90 seconds. Modern crushers achieve up to 95% volume reduction, making transportation efficient and environmentally friendly. These portable units bring the recycling process directly to the vehicle location, eliminating transportation costs and carbon emissions. Advanced crushers are equipped with fluid collection systems to prevent environmental contamination, and sophisticated cutting systems separate high-value metals from other materials. This technology has dramatically improved the efficiency of end-of-life vehicle processing.',
+                  ),
+                  _buildArticleCard(
+                    'The Oil & Gas Equipment Challenge',
+                    'Tackling the complex recycling and disposal of oilfield equipment and facility components.',
+                    Icons.oil_barrel,
+                    Colors.brown,
+                    'Oil and gas equipment recycling presents unique challenges due to hazardous materials, massive scale, and specialized metallurgy. Derrick removals require careful disassembly and material separation, with focus on recovering high-value alloys and properly disposing of contaminated components. Many oilfield structures contain exotic metals and composites that require specialized recycling processes. Environmental considerations are paramount, with regulations requiring the proper handling of drilling mud, hydraulic fluids, and asbestos-containing materials. Reputable recyclers specialize in oilfield equipment, maintaining certifications like ISN certification for handling hazardous waste.',
+                  ),
+                  _buildArticleCard(
+                    'Container Services and Industrial Metal Collection',
+                    'Strategic waste management solutions for construction, demolition, and industrial operations.',
+                    Icons.inventory_2,
                     AppColors.success,
-                    'Composting is one of the easiest ways to reduce household waste. Nearly 30% of household waste consists of organic material that could be composted instead of going to landfills. Choose from countertop bins for kitchen scraps, outdoor compost piles, or even worm bins for apartments. Compost fruits, vegetables, coffee grounds, eggshells, and yard trimmings—but avoid meat, dairy, oily foods, pet waste, and plastics. Balance green (nitrogen-rich) and brown (carbon-rich) materials, keep the compost moist but not soggy, and turn it regularly for oxygen.',
-                  ),
-                  _buildArticleCard(
-                    'The Environmental Cost of Fast Fashion',
-                    'Understanding how our clothing choices impact the planet.',
-                    Icons.checkroom,
-                    AppColors.warning,
-                    'The fashion industry has a massive environmental footprint, producing 92 million tons of textile waste annually. Fast fashion contributes significantly to this problem. One cotton t-shirt requires 700-2,700 gallons of water to produce, enough for one person to drink for over two years. Textile dyeing uses over 8,000 chemicals annually, and the industry contributes 10% of global carbon emissions. Sustainable solutions include buying less and choosing quality, shopping second-hand, seeking certified organic clothing, and donating or repurposing garments instead of discarding them.',
+                    'Roll-off containers provide flexible waste management solutions for metal-intensive industries. Contractors can separate metal wastes at the source, maximizing recycling value and reducing landfill contamination. Different container sizes accommodate various project scales, from small renovation projects to large industrial cleanouts. Advanced container design includes weather-proofing and secure locking systems. GPS tracking enables efficient route planning and inventory management. The roll-off container business model supports the circular economy by keeping valuable metals in productive use rather than allowing them to accumulate in landfills.',
                   ),
                 ],
               ),

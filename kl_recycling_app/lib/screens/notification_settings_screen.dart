@@ -71,7 +71,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   ),
                 ),
                 value: _notificationsEnabled,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: (value) async {
                   setState(() => _notificationsEnabled = value);
                   await NotificationService.setNotificationsEnabled(value);
@@ -118,7 +118,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   ),
                 ),
                 value: _notificationsEnabled && _remindersEnabled,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: _notificationsEnabled ? (value) async {
                   setState(() => _remindersEnabled = value);
                   await NotificationService.setReminderEnabled(value);
@@ -211,7 +211,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   ),
                 ),
                 value: _notificationsEnabled && _weeklySummariesEnabled,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: _notificationsEnabled ? (value) async {
                   setState(() => _weeklySummariesEnabled = value);
                   await NotificationService.setWeeklySummaryEnabled(value);
@@ -239,7 +239,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   ),
                 ),
                 value: _notificationsEnabled && _achievementsEnabled,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: _notificationsEnabled ? (value) async {
                   setState(() => _achievementsEnabled = value);
                   await NotificationService.setAchievementEnabled(value);
@@ -267,7 +267,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
                   ),
                 ),
                 value: _notificationsEnabled && _tipsEnabled,
-                activeColor: AppColors.primary,
+                activeThumbColor: AppColors.primary,
                 onChanged: _notificationsEnabled ? (value) async {
                   setState(() => _tipsEnabled = value);
                   await NotificationService.setTipsEnabled(value);
