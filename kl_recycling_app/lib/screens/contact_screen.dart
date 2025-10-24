@@ -47,8 +47,23 @@ class _ContactScreenState extends State<ContactScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Submit contact form to backend/service
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      // Prepare contact form data
+      final contactData = {
+        'contact_reason': _contactReason,
+        'name': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'subject': _subjectController.text.trim(),
+        'message': _messageController.text.trim(),
+        'timestamp': DateTime.now().toIso8601String(),
+      };
+
+      // TODO: Replace with actual backend service call
+      // For now, simulate sending to API or database
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Print to console for debugging (in production, this would be logged properly)
+      debugPrint('Contact form submitted: ${contactData.toString()}');
 
       if (!mounted) return;
 
@@ -56,6 +71,7 @@ class _ContactScreenState extends State<ContactScreen> {
         const SnackBar(
           content: Text('Message sent successfully! We\'ll get back to you within 24 hours.'),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
         ),
       );
 
@@ -72,7 +88,10 @@ class _ContactScreenState extends State<ContactScreen> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error sending message: $e')),
+        SnackBar(
+          content: Text('Error sending message: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       if (mounted) {

@@ -80,8 +80,32 @@ class _ContainerQuoteFormState extends State<ContainerQuoteForm> {
     setState(() => _isLoading = true);
 
     try {
-      // TODO: Submit quote request to backend/service
-      await Future.delayed(const Duration(seconds: 2)); // Simulate API call
+      // Prepare quote data
+      final quoteData = {
+        'container_size': _selectedSize,
+        'delivery_date': _deliveryDate!.toIso8601String(),
+        'rental_duration': _rentalDuration,
+        'contact': {
+          'name': _nameController.text.trim(),
+          'phone': _phoneController.text.trim(),
+          'email': _emailController.text.trim(),
+        },
+        'address': {
+          'street': _addressController.text.trim(),
+          'city': _cityController.text.trim(),
+          'zip': _zipController.text.trim(),
+        },
+        'notes': _notesController.text.trim(),
+        'timestamp': DateTime.now().toIso8601String(),
+        'container_type': widget.containerType,
+      };
+
+      // TODO: Replace with actual backend service call
+      // For now, simulate storing in local database or sending to API
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Print to console for debugging (in production, this would be logged properly)
+      debugPrint('Quote submitted: ${quoteData.toString()}');
 
       if (!mounted) return;
 
@@ -89,6 +113,7 @@ class _ContainerQuoteFormState extends State<ContainerQuoteForm> {
         const SnackBar(
           content: Text('Quote request submitted! We\'ll contact you within 24 hours.'),
           backgroundColor: Colors.green,
+          duration: Duration(seconds: 4),
         ),
       );
 
@@ -97,7 +122,10 @@ class _ContainerQuoteFormState extends State<ContainerQuoteForm> {
       if (!mounted) return;
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error submitting quote: $e')),
+        SnackBar(
+          content: Text('Error submitting quote: ${e.toString()}'),
+          backgroundColor: Colors.red,
+        ),
       );
     } finally {
       if (mounted) {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/providers/gamification_provider.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
-import '../models/gamification.dart';
+import '../models/gamification.dart' as gamification;
 
 class AnalyticsDashboardScreen extends StatefulWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -26,12 +27,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.share),
-            onPressed: () {
-              // TODO: Implement sharing functionality
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Sharing functionality coming soon!')),
-              );
-            },
+            onPressed: _shareImpactReport,
             tooltip: 'Share Impact',
           ),
         ],
@@ -176,7 +172,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
     );
   }
 
-  Widget _buildMaterialBreakdown(UserGamificationStats stats) {
+  Widget _buildMaterialBreakdown(gamification.UserGamificationStats stats) {
     if (stats.materialTotals.isEmpty) {
       return CustomCard(
         color: AppColors.surface,
@@ -257,7 +253,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
     );
   }
 
-  Widget _buildGoalsProgress(UserGamificationStats stats) {
+  Widget _buildGoalsProgress(gamification.UserGamificationStats stats) {
     // Sample goals - in real app this would be customizable
     const monthlyWeightGoal = 50.0; // lbs per month
     const monthlyItemsGoal = 10; // items per month
@@ -346,7 +342,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
     );
   }
 
-  Widget _buildEnvironmentalEquivalents(UserGamificationStats stats) {
+  Widget _buildEnvironmentalEquivalents(gamification.UserGamificationStats stats) {
     // Simple equivalencies based on total weight
     final totalWeight = stats.totalWeight.toDouble();
     final estimatedCO2 = totalWeight * 2.5; // Rough estimate: 2.5 kg CO2 per lb
@@ -499,6 +495,32 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
 
   String _getMaterialDisplayName(String material) {
     return material[0].toUpperCase() + material.substring(1);
+  }
+
+  void _shareImpactReport() {
+    final gamificationProvider = context.read<GamificationProvider>();
+    final stats = gamificationProvider.stats;
+
+    final totalWeight = stats.totalWeight.toDouble();
+    final estimatedEnergy = totalWeight * 8; // Rough estimate
+    final estimatedCO2 = totalWeight * 2.5; // Rough estimate
+
+    final shareText = '''
+🌍 My Recycling Impact with K&L Recycling!
+
+📊 Total Weight Recycled: ${stats.totalWeight} lbs
+🏆 Achievements Earned: ${stats.earnedBadges.length}
+⚡ Energy Saved: ≈${estimatedEnergy.toStringAsFixed(0)} kWh
+🌱 CO₂ Avoided: ≈${estimatedCO2.toStringAsFixed(0)} kg
+
+🚗 That's like not driving ${(estimatedCO2 / 0.404).toStringAsFixed(0)} miles!
+💡 Enough electricity for ${estimatedEnergy ~/ 13} days of home use!
+
+Join me in making a difference! Download the K&L Recycling app today.
+#KLRecycling #GoGreen #Sustainability
+    ''';
+
+    Share.share(shareText.trim());
   }
 }
 

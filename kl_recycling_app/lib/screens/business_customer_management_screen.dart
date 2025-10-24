@@ -609,30 +609,30 @@ class _BusinessCustomerManagementScreenState
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(context); // Close dialog
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.pop(context); // Close dialog
 
-              final success = await context
-                  .read<BusinessCustomerProvider>()
-                  .deleteCustomer(customer.id);
+                final success = await context
+                    .read<BusinessCustomerProvider>()
+                    .deleteCustomer(customer.id);
 
-              if (success) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('${customer.companyName} has been deleted'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Failed to delete customer'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
-              }
-            },
+                if (success && context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('${customer.companyName} has been deleted'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                } else if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to delete customer'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
