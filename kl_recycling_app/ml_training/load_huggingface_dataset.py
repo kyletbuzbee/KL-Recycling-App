@@ -187,7 +187,7 @@ class HuggingFaceDatasetLoader:
 
             txt_path = image_path.with_suffix('.txt')
             with open(txt_path, 'w') as f:
-                f.write(annotation['yolo_bbox'] + '\\n')
+                f.write(annotation['yolo_bbox'] + '\n')
 
             return True
 
