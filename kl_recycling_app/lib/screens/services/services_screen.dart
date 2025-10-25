@@ -4,6 +4,7 @@ import 'package:kl_recycling_app/config/animations.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
 import 'package:kl_recycling_app/screens/forms/container_quote_form.dart';
+import 'package:kl_recycling_app/screens/appointment_booking_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -94,6 +95,24 @@ class _ServicesScreenState extends State<ServicesScreen>
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _navigateToAppointmentBooking(context),
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
+        icon: const Icon(Icons.schedule),
+        label: const Text('Book Appointment'),
+        elevation: 4,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  void _navigateToAppointmentBooking(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AppointmentBookingScreen(),
+      ),
     );
   }
 }
@@ -166,11 +185,11 @@ class SpecializedServicesTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
+        Text(
           'Specialized Services',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: AppColors.onSurface,
           ),
         ),
         const SizedBox(height: 8),
@@ -178,7 +197,7 @@ class SpecializedServicesTab extends StatelessWidget {
           'Expert handling of specific materials and equipment',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey[600],
+            color: AppColors.onSurfaceSecondary,
           ),
         ),
         const SizedBox(height: 24),
@@ -208,7 +227,7 @@ class EquipmentServicesTab extends StatelessWidget {
           'Heavy equipment and containers for large-scale projects',
           style: TextStyle(
             fontSize: 16,
-            color: Colors.grey[600],
+            color: AppColors.onSurfaceSecondary,
           ),
         ),
         const SizedBox(height: 24),

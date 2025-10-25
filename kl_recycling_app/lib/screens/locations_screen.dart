@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/config/constants.dart';
+import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
 
 class LocationsScreen extends StatelessWidget {
@@ -19,11 +19,11 @@ class LocationsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Our Locations',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.onSurface,
               ),
             ),
             const SizedBox(height: 16),
@@ -31,6 +31,7 @@ class LocationsScreen extends StatelessWidget {
             // Main Location Card
             CustomCard(
               padding: const EdgeInsets.all(24),
+              color: Colors.white,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -156,22 +157,57 @@ class LocationsScreen extends StatelessWidget {
               ),
             ),
 
+            const SizedBox(height: 24),
+
+            // All K&L Recycling Locations
+            CustomCard(
+              padding: const EdgeInsets.all(20),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.location_city,
+                          color: AppColors.primary,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          'All K&L Recycling Locations',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.onSurface,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                  ...AppConstants.locations.map((location) => Padding(
+                    padding: const EdgeInsets.only(bottom: 16),
+                    child: _buildLocationTile(location),
+                  )),
+                ],
+              ),
+            ),
+
             const SizedBox(height: 32),
 
             // Service Areas
-            const Text(
+            Text(
               'Service Areas',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.w900,
+                color: AppColors.onSurface,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               'We provide scrap metal recycling and container services within a ${AppConstants.serviceRadiusMiles}-mile radius of our main yard',
-              style: const TextStyle(
-                fontSize: 16,
-                color: Color(0xFF757575),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                height: 1.6,
               ),
             ),
             const SizedBox(height: 16),
@@ -182,11 +218,12 @@ class LocationsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Major Cities & Areas Served',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -223,11 +260,12 @@ class LocationsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Transportation & Logistics',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -270,19 +308,18 @@ class LocationsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Need Service Outside Our Area?',
                     style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Contact us for special arrangements or to discuss services beyond our regular service radius.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Color(0xFF757575),
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       height: 1.5,
                     ),
                   ),
@@ -321,6 +358,163 @@ class LocationsScreen extends StatelessWidget {
       const SnackBar(content: Text('Redirecting to contact form...')),
     );
   }
+
+  Widget _buildLocationTile(Map<String, dynamic> location) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: AppColors.primary.withOpacity(0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Icon(
+                  Icons.business,
+                  size: 20,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        if (location['isHeadquarters'] == true)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(12),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: AppColors.primary.withOpacity(0.3),
+                                  blurRadius: 2,
+                                  offset: const Offset(0, 1),
+                                ),
+                              ],
+                            ),
+                            child: const Text(
+                              'HQ',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        Expanded(
+                          child: Text(
+                            location['name'] as String,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      location['address'] as String,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.3,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Wrap(
+                      spacing: 6,
+                      children: (location['services'] as List).map<Widget>((service) => Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withOpacity(0.08),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: AppColors.primary.withOpacity(0.25),
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          service as String,
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )).toList(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              Icon(
+                Icons.phone,
+                size: 16,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                location['phone'] as String,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(
+                Icons.schedule,
+                size: 16,
+                color: AppColors.primary,
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  location['hours'] as String,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    height: 1.2,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 class _ServiceAreaChip extends StatelessWidget {
@@ -333,10 +527,18 @@ class _ServiceAreaChip extends StatelessWidget {
     return Chip(
       label: Text(
         label,
-        style: const TextStyle(fontSize: 14),
+        style: TextStyle(
+          fontSize: 14,
+          color: AppColors.primary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
-      backgroundColor: AppColors.primary.withOpacity(0.1),
-      side: const BorderSide(color: Color(0xFFC8E6C9)),
+      backgroundColor: AppColors.primary.withOpacity(0.08),
+      side: BorderSide(
+        color: AppColors.primary.withOpacity(0.25),
+        width: 1,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
     );
   }
 }
@@ -376,9 +578,10 @@ class _InfoRow extends StatelessWidget {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
+                  color: AppColors.onSurface,
                 ),
               ),
               const SizedBox(height: 4),
@@ -386,8 +589,8 @@ class _InfoRow extends StatelessWidget {
                 description,
                 style: const TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF757575),
                   height: 1.4,
+                  color: AppColors.onSurfaceSecondary,
                 ),
               ),
             ],

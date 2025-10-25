@@ -5,6 +5,8 @@ import '../providers/business_customer_provider.dart';
 import '../models/business_customer.dart';
 import '../widgets/common/custom_card.dart';
 import '../config/theme.dart';
+import '../screens/analytics_dashboard_screen.dart';
+import '../screens/enhanced_analytics_screen.dart';
 
 class BusinessCustomerManagementScreen extends StatefulWidget {
   const BusinessCustomerManagementScreen({super.key});
@@ -58,7 +60,12 @@ class _BusinessCustomerManagementScreenState
           IconButton(
             icon: const Icon(Icons.analytics),
             onPressed: _showAnalyticsDialog,
-            tooltip: 'View Analytics',
+            tooltip: 'View Basic Analytics',
+          ),
+          IconButton(
+            icon: const Icon(Icons.insights),
+            onPressed: _showEnhancedAnalyticsDialog,
+            tooltip: 'View Business Intelligence',
           ),
         ],
       ),
@@ -589,9 +596,20 @@ class _BusinessCustomerManagementScreenState
   }
 
   void _showAnalyticsDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => BusinessAnalyticsDialog(),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AnalyticsDashboardScreen(),
+      ),
+    );
+  }
+
+  void _showEnhancedAnalyticsDialog() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const EnhancedAnalyticsScreen(),
+      ),
     );
   }
 
@@ -759,7 +777,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
                   const SizedBox(height: 16),
 
                   DropdownButtonFormField<String>(
-                    value: _businessTypeController.text.isEmpty
+                    initialValue: _businessTypeController.text.isEmpty
                         ? 'construction'
                         : _businessTypeController.text,
                     decoration: const InputDecoration(
@@ -809,7 +827,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<CustomerTier>(
-                          value: _selectedTier,
+                          initialValue: _selectedTier,
                           decoration: const InputDecoration(
                             labelText: 'Service Tier',
                             border: OutlineInputBorder(),
@@ -828,7 +846,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: DropdownButtonFormField<ContractStatus>(
-                          value: _selectedStatus,
+                          initialValue: _selectedStatus,
                           decoration: const InputDecoration(
                             labelText: 'Contract Status',
                             border: OutlineInputBorder(),

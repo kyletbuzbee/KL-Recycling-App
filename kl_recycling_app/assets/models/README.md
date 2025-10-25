@@ -6,11 +6,16 @@ This directory contains the machine learning models used by the Enhanced Weight 
 
 Place the following TensorFlow Lite models in this directory:
 
-### 1. `scrap_metal_detector.tflite`
+### 1. `scrap_metal_detector_v20251024_023843.tflite` (PRIMARY)
 - **Purpose**: Primary object detection model for scrap metal
 - **Input**: 224x224 RGB image (normalized 0-1)
 - **Output**: Bounding boxes, class scores, confidence values
-- **Training**: Custom trained on various scrap metal types
+- **Training**: Custom trained on diverse scrap metal dataset (v20251024_023843)
+- **Status**: Latest trained model - preferred for highest accuracy
+
+### 1. `scrap_metal_detector.tflite` (LEGACY)
+- **Purpose**: Primary object detection model for scrap metal (fallback)
+- **Status**: Legacy model - used if v20251024_023843 not available
 
 ### 2. `depth_estimator.tflite` (Optional)
 - **Purpose**: Monocular depth estimation for volume calculation

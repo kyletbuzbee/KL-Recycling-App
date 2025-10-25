@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <!-- Allow HTTPS traffic only -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">api.klrecycling.com</domain>
+        <domain includeSubdomains="true">firestore.googleapis.com</domain>
+        <domain includeSubdomains="true">firebaseauth.googleapis.com</domain>
+        <domain includeSubdomains="true">firebasestorage.googleapis.com</domain>
+    </domain-config>
+
+    <!-- Pin certificates for critical domains (add actual pins in production) -->
+    <!--
+    <pin-set expiration="2026-01-01">
+        <pin digest="SHA-256">your_certificate_pin_here</pin>
+    </pin-set>
+    -->
+
+    <!-- Debug overrides for development (remove in production) -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="user" />
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>

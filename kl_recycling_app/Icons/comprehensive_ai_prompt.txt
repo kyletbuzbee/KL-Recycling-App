@@ -1,0 +1,79 @@
+COMPREHENSIVE K&L RECYCLING APP ICON GENERATION PROMPT
+=======================================================
+
+BRAND OVERVIEW:
+K&L Recycling is a professional scrap metal recycling company with 9 locations across Texas (HQ in Tyler) and Kansas. Our mobile app features AI-powered weight estimation using TensorFlow Lite. We serve both individual scrap collectors and commercial industrial clients with specialized services like mobile car crushing and oil/gas equipment demolition.
+
+DESIGN SYSTEM REQUIREMENTS:
+• Brand Colors: Royal Blue (#0B3D91) primary, Electric Blue (#3B82F6) secondary
+• Theme: Industrial heavy equipment meets modern mobile app interface
+• Style: Clean, minimal, vector-like design with medium line weights (2-3px)
+• Background: Transparent PNG only - no colored backgrounds
+• Platform: Mobile app (Flutter), optimized for 64x64px to 128x128px sizes
+• Accessibility: High contrast, WCAG AA compliant
+
+COMPLETE ICON SET SPECIFICATIONS:
+Each icon must be professional, industrial, and immediately recognizable at small sizes.
+
+1. MATERIAL RECOGNITION ICONS (AI/ML Features):
+----------------------------------------------------------------------
+camera_overlay_ml: Smartphone camera viewfinder overlay with precise measurement grid lines and digital weight display readout - represents AI-powered photo analysis
+material_detector: Scanning smartphone with color-coded material detection indicators - copper(orange), steel(blue), aluminum(green) - showing real-time scrap identification
+weight_scale_accurate: Professional industrial digital scale with LED screen showing weight measurement, concrete industrial floor background
+ai_brain_circuit: Neural network visualization forming eye shape with electric blue signals, circuit board pattern representing TensorFlow Lite ML processing
+
+2. SCRAP METAL TYPE ICONS (7 Materials We Accept):
+----------------------------------------------------------------------
+metal_steel_fragments: Piled structural steel beams, rebar sections, industrial steel fragments - rough blue-gray metallic appearance, heavy construction theme
+metal_aluminum_sheets: Stacked aluminum sheets, compressed bale of cans, extruded aluminum profiles - shiny silver metallic finish, lightweight construction
+metal_copper_wiring: Coiled copper electrical wire, bundled wire spools, copper plumbing pipe sections - orange-brown copper color, electrical conductivity theme
+metal_brass_fittings: Brass plumbing valves, fittings, decorative brass components - gold-yellow metallic finish, industrial plumbing machinery
+metal_zinc_parts: Zinc-coated metal sheets, galvanized steel pieces, protective coating samples - silver with blue protective coating tint
+metal_stainless_panels: Polished stainless steel sheets, corrosion-resistant panels in industrial stacks - chrome finish, durable construction
+metal_iron_castings: Rough cast iron engine blocks, heavy industrial castings, foundry products - dark rough metallic texture, traditional heavy industry
+
+3. SERVICE DELIVERY ICONS (Operational Equipment):
+----------------------------------------------------------------------
+container_roll_off: Orange industrial roll-off dumpster on heavy-duty wheels, rectangular container for construction waste management
+truck_delivery_mobile: Blue K&L Recycling branded service truck with cargo bed and delivery capacity, professional commercial vehicle
+hook_lift_specialized: Industrial truck with hydraulic hook-lift mechanism for container handling, specialized heavy equipment design
+car_crusher_mobile: Hydraulic automobile crushing equipment, vehicle recycling machinery, professional scrap processing technology
+
+4. NAVIGATION ESSENTIALS (6 App Tabs):
+----------------------------------------------------------------------
+home_dashboard: Multi-function mobile app home screen grid showing feature shortcuts - camera, services, locations, education, impact in 2x3 navigation layout
+camera_photo_estimate: Smartphone camera interface with measurement overlay and technical analysis indicators, representing photo-based weight estimation
+services_build: Industrial tools toolbox containing recycling equipment - gears, wrenches, service delivery tools in organized arrangement
+locations_map: Geographic map showing K&L service coverage area with 9 location markers across Texas and Kansas, regional network visualization
+education_school: Educational content library with books and learning materials about sustainable recycling practices, knowledge sharing
+impact_sustainability: Achievement award trophy with environmental sustainability ribbons and green leaf indicators, recognition system
+
+5. BUSINESS PORTAL ICONS (Commercial Features):
+----------------------------------------------------------------------
+business_client_portal: Modern office building with business charts and analytics displays, representing commercial client management system
+analytics_dashboard: Business intelligence interface with bar graphs, trend lines, profit/loss indicators for management dashboard
+contract_services: Legal document with signature lines and contract terms, professional service agreement documentation
+inventory_tracking: Warehouse storage system with barcode labels, organized inventory bins, metal sorting and storage management
+
+TECHNICAL IMPLEMENTATION REQUIREMENTS:
+• Output Format: Individual PNG files per icon, transparent background, 512x512px source resolution
+• File Naming: Use lowercase_with_underscores format (e.g., camera_overlay_ml.png, metal_steel_fragments.png)
+• Delivery: High-resolution PNG exports ready for automatic resizing to 128x128px (Flutter app size) and 64x64px (notification size)
+• Quality: 100% quality output, no compression artifacts, clean alpha channels
+• Testing: Each icon must be visually clear and recognizable when viewed at 32x32px (extreme small size test)
+• Consistency: Maintain uniform line weights, corner radii, and spacing across entire icon set
+
+AGGRESSIVE DEVELOPMENT ROADMAP:
+Phase 1 MVP (16 icons): navigation(6) + materials(4 core) + services(3) + AI(3)
+Phase 2 Business (12 additional): commercial(4) + materials(3) + location(5)
+Phase 3 Enterprise (8 additional): safety(4) + advanced services(4)
+
+CONTENT VALIDATION REQUIREMENTS:
+• Industrial Accuracy: All equipment and metal types must be technically accurate
+• Brand Integration: Royal blue coloring throughout, no conflicting color themes
+• Professional Quality: No cartoon elements, industrial/commercial appearance
+• Functional Clarity: Each icon's purpose must be immediately understandable
+• Accessibility: High contrast for all icon elements, colorblind-safe color choices
+• Scalability: Vector-like design maintains clarity at all mobile app sizes
+
+FINAL DELIVERABLE: Complete 36-icon professional icon set in transparent PNG format, optimized for Flutter mobile application integration with consistent K&L Recycling brand identity and industrial recycling industry standards.

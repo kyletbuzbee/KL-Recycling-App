@@ -14,12 +14,30 @@ import 'package:kl_recycling_app/screens/locations_screen.dart';
 import 'package:kl_recycling_app/screens/contact_screen.dart';
 import 'package:kl_recycling_app/screens/educational_screen.dart';
 import 'package:kl_recycling_app/screens/gamification_screen.dart';
-import 'package:kl_recycling_app/screens/business_customer_management_screen.dart';
+
 import 'package:kl_recycling_app/services/notification_service.dart';
 import 'package:kl_recycling_app/services/ai/weight_prediction_service.dart' as ai_service;
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
 import 'package:kl_recycling_app/widgets/common/photo_guidance_overlay.dart';
+import 'package:kl_recycling_app/utils/error_messages.dart';
+import 'package:kl_recycling_app/services/offline_manager.dart';
+import 'package:kl_recycling_app/services/analytics_service.dart';
+import 'package:kl_recycling_app/services/appointment_service.dart';
+import 'package:kl_recycling_app/services/enhanced_analytics_service.dart';
+import 'package:kl_recycling_app/providers/auth_provider.dart';
+import 'package:kl_recycling_app/providers/loyalty_provider.dart';
+import 'package:kl_recycling_app/services/auth_service.dart';
+import 'package:kl_recycling_app/services/loyalty_service.dart';
+import 'package:kl_recycling_app/screens/auth/login_screen.dart';
+import 'package:kl_recycling_app/screens/auth/signup_screen.dart';
+import 'package:kl_recycling_app/screens/loyalty/loyalty_dashboard_screen.dart';
+import 'package:kl_recycling_app/screens/loyalty/rewards_catalog_screen.dart';
+import 'package:kl_recycling_app/screens/loyalty/achievement_gallery_screen.dart';
+import 'package:kl_recycling_app/screens/loyalty/referral_program_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:kl_recycling_app/firebase_options.dart';
+import 'package:kl_recycling_app/services/firebase_service.dart';
 
 // Platform-specific imports
 import 'package:package_info_plus/package_info_plus.dart';
@@ -34,10 +52,21 @@ enum PlatformVariant {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Skip Firebase initialization for now to prevent crashes
-  print('Firebase initialization skipped for testing');
+  // Initialize Firebase Core
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    print('Firebase initialized successfully');
 
-  // Initialize notification service (non-Firebase)
+    // Initialize Firebase services
+    await FirebaseService.initialize();
+    print('Firebase services initialized');
+  } catch (e) {
+    print('Firebase initialization failed: $e');
+  }
+
+  // Initialize notification service
   try {
     await NotificationService.initialize();
     print('Notification service initialized');
@@ -51,6 +80,20 @@ void main() async {
         ChangeNotifierProvider(create: (_) => CameraProvider()),
         ChangeNotifierProvider(create: (_) => BusinessCustomerProvider()),
         ChangeNotifierProvider(create: (_) => GamificationProvider()),
+        ChangeNotifierProvider(create: (_) => OfflineManager()),
+        ChangeNotifierProvider(create: (_) => AnalyticsService()),
+        ChangeNotifierProvider(create: (_) => AppointmentService()),
+        ChangeNotifierProvider(create: (_) => EnhancedAnalyticsService()),
+        ChangeNotifierProvider(create: (_) => LoyaltyService()),
+        ChangeNotifierProxyProvider<LoyaltyService, LoyaltyProvider>(
+          create: (context) => LoyaltyProvider(context.read<LoyaltyService>()),
+          update: (_, loyaltyService, loyaltyProvider) => loyaltyProvider!..loyaltyService = loyaltyService,
+        ),
+        ChangeNotifierProvider(create: (_) => AuthService()),
+        ProxyProvider<AuthService, AuthProvider>(
+          create: (context) => AuthProvider(context.read<AuthService>()),
+          update: (context, authService, previous) => AuthProvider(authService),
+        ),
       ],
       child: const KLRecyclingApp(),
     ),
@@ -68,7 +111,7 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver {
   late CameraProvider _cameraProvider;
-  models.PhotoQuality _currentQuality = models.PhotoQuality.fair;
+  final models.PhotoQuality _currentQuality = models.PhotoQuality.fair;
   List<String> _currentTips = [];
   bool _showTutorial = false;
   bool _isFirstTime = true;
@@ -260,7 +303,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(12),
@@ -380,8 +423,10 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
       await _aiService.initialize();
       _serviceInitialized = true;
 
-      // Now run analysis
-      await _analyzeImageAI();
+      // Show success message for initialization instead of running analysis
+      if (mounted) {
+        debugPrint('AI service ready - select material type to analyze');
+      }
     } catch (e) {
       debugPrint('AI service initialization failed: $e');
       // Continue with manual estimation only
@@ -399,10 +444,12 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
     });
 
     try {
-      final result = await _aiService.predictWeightFromImage(
+      // Use the enhanced retry logic with progressive fallback
+      final result = await _aiService.predictWeightFromImageWithRetry(
         imagePath: widget.imagePath,
         materialType: _selectedMaterial,
         manualEstimate: _estimatedWeight > 0 ? _estimatedWeight : null,
+        maxRetries: 3, // Allow up to 3 retry attempts
       );
 
       if (mounted) {
@@ -415,6 +462,17 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
             _estimatedWeight = result.estimatedWeight;
           }
         });
+
+        // Show success feedback for low confidence results
+        if (result.confidenceScore < 0.6) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Analysis complete - consider manual verification'),
+              backgroundColor: Colors.blue,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        }
       }
     } catch (e) {
       if (mounted) {
@@ -422,10 +480,29 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
           _isAnalyzing = false;
         });
 
+        // Use enhanced error messaging based on error type
+        final errorMessage = e.toString().toLowerCase();
+
+        String errorType = 'general_error';
+        if (errorMessage.contains('permission') || errorMessage.contains('camera')) {
+          errorType = 'camera_not_available';
+        } else if (errorMessage.contains('network') || errorMessage.contains('connection')) {
+          errorType = 'network_connection_lost';
+        } else if (errorMessage.contains('storage') || errorMessage.contains('space')) {
+          errorType = 'storage_full';
+        } else if (errorMessage.contains('model') || errorMessage.contains('load')) {
+          errorType = 'ai_model_load_failed';
+        }
+
+        // Show enhanced error snackbar with action
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('AI analysis failed: ${e.toString()}'),
-            backgroundColor: Colors.orange,
+          ErrorMessages.getErrorSnackBar(
+            context,
+            errorType,
+            onActionPressed: () {
+              // Retry the analysis
+              _analyzeImageAI();
+            },
           ),
         );
       }
@@ -507,27 +584,45 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
                         ),
                       ),
                     ),
-                  // AI result indicator
-                  if (_aiPrediction != null && !_isAnalyzing)
-                    Positioned(
-                      top: 16,
-                      right: 16,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                        color: _aiPrediction!.confidenceColor.withValues(alpha: 1.0),
-                          borderRadius: BorderRadius.circular(20),
+              // Enhanced AI confidence indicator
+              if (_aiPrediction != null && !_isAnalyzing)
+                Positioned(
+                  top: 16,
+                  right: 16,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _aiPrediction!.confidenceColor.withValues(alpha: 1.0),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: _aiPrediction!.confidenceColor.withValues(alpha: 0.3),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
-                        child: Text(
-                          '${_aiPrediction!.confidenceDescription} Confidence',
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _getConfidenceIcon(_aiPrediction!.confidenceScore),
+                          color: Colors.white,
+                          size: 14,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${(_aiPrediction!.confidenceScore * 100).round()}% Confidence',
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                      ),
+                      ],
                     ),
+                  ),
+                ),
                 ],
               ),
             ),
@@ -704,9 +799,7 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
                               ? 'Override AI Weight (lbs)'
                               : 'Enter Weight (lbs)',
                             border: const OutlineInputBorder(),
-                            hintText: _aiPrediction != null
-                              ? '${_aiPrediction!.estimatedWeight.toStringAsFixed(1)}'
-                              : null,
+                            hintText: _aiPrediction?.estimatedWeight.toStringAsFixed(1),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (value) {
@@ -841,9 +934,17 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
     );
   }
 
+  IconData _getConfidenceIcon(double confidence) {
+    if (confidence >= 0.8) return Icons.verified; // High confidence
+    if (confidence >= 0.6) return Icons.check_circle; // Medium confidence
+    if (confidence >= 0.4) return Icons.warning; // Low confidence
+    return Icons.error; // Very low confidence
+  }
+
   Future<void> _saveEstimate() async {
     try {
       final cameraProvider = context.read<CameraProvider>();
+      final analyticsService = context.read<AnalyticsService>();
 
       // Get current location
       final position = await cameraProvider.getCurrentLocation();
@@ -860,12 +961,20 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
         estimatedValue: null,
       );
 
+      // Add to camera provider
       cameraProvider.addEstimate(photoEstimate);
+
+      // Track in analytics service for business intelligence
+      await analyticsService.trackPhotoEstimate(photoEstimate);
 
       if (!mounted) return;
 
+      // Show success message with customer tier if available
+      final customerTier = analyticsService.getCustomerTier(photoEstimate.timestamp.toIso8601String().substring(0, 8)); // Simple customer ID fallback
+      final tierMessage = customerTier != CustomerTier.bronze ? ' (You\'re a ${customerTier.displayName} member!)' : '';
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Estimate saved successfully!')),
+        SnackBar(content: Text('Estimate saved successfully!$tierMessage')),
       );
 
       Navigator.pop(context); // Go back to camera
@@ -947,9 +1056,10 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const CameraScreen(),
-    const BusinessCustomerManagementScreen(),
+    const ServicesScreen(),
     const LocationsScreen(),
     const EducationalScreen(),
+    const LoyaltyDashboardScreen(),
     const GamificationScreen(),
   ];
 
@@ -966,6 +1076,15 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system, // Auto-switch based on system preference
+      routes: {
+        '/login': (context) => const LoginScreen(),
+        '/signup': (context) => const SignupScreen(),
+        '/rewards': (context) => const RewardsCatalogScreen(),
+        '/achievements': (context) => const AchievementGalleryScreen(),
+        '/referral': (context) => const ReferralProgramScreen(),
+        '/points-history': (context) => const LoyaltyDashboardScreen(), // Will show points history section
+        '/leaderboard': (context) => const LoyaltyDashboardScreen(), // Will show leaderboard section
+      },
       home: Scaffold(
         body: _screens[_currentIndex],
         bottomNavigationBar: BottomNavigationBar(
@@ -1002,6 +1121,11 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
               icon: Icon(Icons.school_outlined),
               activeIcon: Icon(Icons.school),
               label: 'Learn',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.loyalty_outlined),
+              activeIcon: Icon(Icons.loyalty),
+              label: 'Loyalty',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.emoji_events_outlined),

@@ -114,8 +114,9 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
                       Icons.star,
                       [
                         'Position metal centrally in frame',
+                        'Include a reference object (quarter, coin, or ruler) NEXT TO the scrap metal',
+                        'Photograph both items together in same photo for accurate measurements',
                         'Ensure good lighting from multiple angles',
-                        'Include a reference object for scale (coin, quarter, or ruler)',
                         'Avoid shadows and reflections',
                         'Keep camera steady and in focus',
                       ],

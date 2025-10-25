@@ -31,6 +31,20 @@ class AppColors {
   static const Color success = Color(0xFF10B981); // Success Green
   static const Color info = Color(0xFF06B6D4); // Info Cyan
 
+  // AI Confidence specific colors
+  static const Color aiLowConfidence = Color(0xFFF59E0B); // Amber for low confidence (<60%)
+  static const Color aiMediumConfidence = Color(0xFFFF8C00); // Orange for medium confidence (60-80%)
+  static const Color aiHighConfidence = Color(0xFF10B981); // Emerald for high confidence (>80%)
+
+  // Enhanced visual hierarchy colors
+  static const Color onSurfaceTertiary = Color(0xFF94A3B8); // Lower contrast tertiary
+  static const Color onSurfaceQuaternary = Color(0xFFCBD5E1); // Lowest contrast quaternary
+
+  // Processing states
+  static const Color aiProcessing = Color(0xFF00BCD4); // Cyan for processing states
+  static const Color aiSuccessFlash = Color(0xFF10B981); // Green flash for completion
+  static const Color aiWarningFlash = Color(0xFFF59E0B); // Amber flash for warnings
+
   // Light text colors - Enhanced for better contrast (WCAG AA compliance)
   static const Color onPrimaryLight = Colors.white;
   static const Color onSecondaryLight = Colors.white;

@@ -1,0 +1,331 @@
+K&L RECYCLING APP - ICON STRATEGY RECOMMENDATION
+==================================================
+
+ANALYSIS BASED ON APP ARCHITECTURE & BUSINESS MODEL:
+───────────────────────────────────────────────────
+Business: Professional scrap metal recycling with AI-powered weight estimation
+Users: Individual scrap collectors + Commercial industrial clients
+UNIQUE VALUE: TensorFlow Lite ML analysis for accurate metal weight estimation
+Platforms: Mobile (primary), Wear OS, Android TV
+Locations: 9 facilities across Texas (HQ Tyler) + Kansas
+
+CORE ICON CATEGORIES WE NEED (High Priority - App MVP):
+═══════════════════════════════════════════════════════
+
+1. MATERIAL RECOGNITION ICONS (Camera/ML Features)
+─────────────────────────────────────────────────
+Why: Your app's unique AI estimation system is the core differentiator
+Where Used: Photo estimation screen, material selection dropdown
+• camera_overlay_ml (camera overlay with AI grid lines + weight display)
+• material_detector (smartphone scanning with color-coded material dots)
+• weight_scale_accurate (digital industrial scale with LED display)
+• ai_brain_circuit (neural network representing TensorFlow Lite analysis)
+
+2. SCRAP METAL TYPE ICONS (Your Business Foundation)
+───────────────────────────────────────────────────
+Why: Clear visual representation of the 7 materials you accept
+Where Used: Material selection, educational content, weight calculators
+• metal_steel_fragments (industrial steel beams, rebar - blue-gray tones)
+• metal_aluminum_sheets (compressed aluminum cans, extrusions - silver finish)
+• metal_copper_wiring (coiled copper wire, electrical components - copper orange)
+• metal_brass_fittings (brass valves, plumbing components - gold metallic)
+• metal_zinc_parts (zinc-coated parts - silver with blue tint)
+• metal_stainless_panels (stainless steel sheets - polished chrome finish)
+• metal_iron_castings (cast iron parts - rough industrial texture)
+
+3. SERVICE DELIVERY ICONS (Your Operational Services)
+─────────────────────────────────────────────────────
+Why: Visual representation of your actual service offerings
+Where Used: Service selection screen, quote requests, service status
+• container_roll_off (orange industrial dumpster on wheels)
+• truck_delivery_mobile (blue K&L Recycling truck with cargo bed)
+• hook_lift_specialized (industrial truck with lift mechanism)
+• car_crusher_mobile (hydraulic vehicle crushing equipment - oil/gas demo)
+• drop_off_public (public recycling center facility icon)
+
+4. NAVIGATION ESSENTIALS (App Usability)
+───────────────────────────────────────
+Why: Core app navigation matching your current BottomNavigationBar
+Where Used: Main app navigation (6 tabs currently)
+• home_dashboard (multi-feature home screen grid)
+• camera_photo_estimate (smartphone camera stylized)
+• services_build (gear/toolbox representing services)
+• locations_map (service area coverage map)
+• education_school (educational content library)
+• impact_sustainability (achievement/awards for sustainability)
+
+ADVANCED ICON CATEGORIES (Medium Priority - V2+ Features):
+══════════════════════════════════════════════════════════
+
+5. BUSINESS PORTAL ICONS (Commercial Clients)
+────────────────────────────────────────────
+Why: You serve both individual and business customers
+Where Used: Business customer management, analytics dashboard
+• business_client_portal (office building with charts)
+• analytics_dashboard (business intelligence graphs)
+• contract_legal_docs (service agreements with signatures)
+• inventory_management (warehouse storage tracking)
+
+6. SAFETY & COMPLIANCE ICONS (Industrial Standards)
+──────────────────────────────────────────────────
+Why: Scrap metal industry requires safety certifications
+Where Used: Safety training, compliance verification, quality assurance
+• safety_helmet_certified (construction helmet with certifications)
+• compliance_disa_approved (DISA certification badge)
+• compliance_rema_certified (ReMa recycling certification)
+• quality_control_verified (inspection checklist)
+
+7. LOCATION & OPERATIONS ICONS (Service Areas)
+─────────────────────────────────────────────
+Why: You operate across multiple states with pickup services
+Where Used: Locations screen, pickup scheduling, GPS features
+• location_pin_service (blue map pin with K&L logo)
+• warehouse_facility (industrial warehouse with loading dock)
+• service_coverage_area (circular 50-mile service radius map)
+• pickup_schedule_calendar (calendar with recycling appointment)
+
+TECHNICAL ICON SPECIFICATIONS FOR K&L APP:
+═══════════════════════════════════════════
+
+STYLING PRINCIPLES:
+• Brand Colors: Royal Blue #0B3D91 (primary), Electric Blue #3B82F6 (secondary)
+• Theme: Industrial equipment meets modern app interface
+• Weight: Medium line weight (2-3px) for crisp display at small sizes
+• Background: Always transparent PNG (no white backgrounds)
+• Sizes: 128x128px (Flutter icon size), 64x64px (notification size)
+• Contrast: WCAG AA compliant (your theme.dart already supports this)
+
+RECOMMENDED ICON COUNT BY DEVELOPMENT PHASE:
+───────────────────────────────────────────
+
+PHASE 1 - MVP RELEASE (16 icons):
+• 6 Navigation tabs: home, camera, services, locations, education, impact
+• 4 Core materials: steel, aluminum, copper, brass (most common)
+• 3 Services: rolloff_container, truck_delivery, car_crusher
+• 3 AI features: camera_estimate, scale_weight, ai_analysis
+
+PHASE 2 - BUSINESS FEATURES (12 additional icons):
+• Business portal: analytics, inventory, contracts, customer management
+• All materials: zinc, stainless, cast iron, specialized alloys
+• Location features: warehouse, coverage, pickup scheduling
+
+PHASE 3 - ENTERPRISE FEATURES (8 additional icons):
+• Safety compliance: helmet, DISA, ReMa certifications
+• Advanced services: hook_lift, oil_gas_demo, demolition
+• User experience: settings, notifications, favorites
+
+WHY THESE ICONS MATTER FOR YOUR BUSINESS:
+─────────────────────────────────────────
+
+1. VISUAL MATERIAL RECOGNITION
+   Your AI weight estimation is a competitive advantage. Icons should clearly
+   represent the materials you accept to build user confidence.
+
+2. PROFESSIONAL INDUSTRIAL APPEARANCE
+   Scrap metal recycling is industrial work. Icons should look trustworthy,
+   heavy-duty, and technically competent - not cute or cartoonish.
+
+3. MOBILE FIRST OPTIMIZATION
+   Small screens mean icons need to be immediately recognizable at 32x32px.
+   Clean, minimal designs work better than complex illustrations.
+
+4. BRAND CONSISTENCY
+   Royal blue theme throughout reinforces your brand identity across the app.
+
+ICON CREATION WORKFLOW RECOMMENDATION:
+───────────────────────────────────────
+
+1. Start with navigation icons (highest user interaction)
+2. Create material type icons (core business functionality)
+3. Add service icons (your revenue-generating features)
+4. Finish with advanced organizational icons
+
+AI GENERATION PROMPT STRATEGY:
+• Reference specific equipment (e.g., "roll-off dumpster on wheels")
+• Include real brand colors (#0B3D91, #3B82F6)
+• Mention industrial/commercial context
+• Specify "mobile app icon" for appropriate styling
+• Include "transparent background, clean vector style"
+
+DELIVERABLES: 512px PNG files for professional app experience.
+
+DETAILED ICON DESCRIPTIONS - THEME, STYLE, LAYOUT & CONCEPTS
+
+ICON THEME OVERVIEW:
+───────────────────
+All icons follow:
+• Visual Theme: Industrial Recycling (heavy equipment, professional service)
+• Color Theme: Royal Blue (#0B3D91) primary, Electric Blue (#3B82F6) secondary
+• Material Theme: Metallic finishes (steel, aluminum, copper, brass)
+• Style: Minimalist vector-like design, 2-3px line weights, clean edges
+• Layout: Centered composition, maximum 80% of canvas used
+• Background: Transparent PNG, no fill shapes behind elements
+
+─────────────────────────────────────────────────────────────────────────────
+
+1. MATERIAL RECOGNITION ICONS (AI/ML Features):
+────────────────────────────────────────────────────────
+
+camera_overlay_ml
+• THEME: Advanced AI technology meets industrial photography
+• STYLE: Technical interface design with camera and digital elements
+• LAYOUT: Smartphone camera overlay with grid lines and weight display
+• CONCEPT: Camera viewfinder showing measuring grid + digital weight readout
+
+material_detector
+• THEME: Smart material identification technology
+• STYLE: Modern scanning interface with colored material indicators
+• LAYOUT: Smartphone tilted with material detection dots (copper=orange, steel=blue, aluminum=green)
+• CONCEPT: Real-time scrap metal identification with visual feedback
+
+weight_scale_accurate
+• THEME: Professional industrial weighing equipment
+• STYLE: Digital scale with LED screen and industrial construction
+• LAYOUT: Digital scale platform with illuminated weight display
+• CONCEPT: Accurate weight measurement for scrap metal valuation
+
+ai_brain_circuit
+• THEME: Artificial intelligence and machine learning
+• STYLE: Neural network visualization with circuit board elements
+• LAYOUT: Connected nodes forming eye shape with electric signals
+• CONCEPT: TensorFlow Lite analyzing metal types via camera input
+
+─────────────────────────────────────────────────────────────────────────────
+
+2. SCRAP METAL TYPE ICONS (Business Foundation Materials):
+────────────────────────────────────────────────────────
+
+metal_steel_fragments
+• THEME: Industrial construction and manufacturing steel
+• STYLE: Rough industrial metal appearance, blue-gray metallic finish
+• LAYOUT: Piled structural steel beams, rebar, and industrial fragments
+• CONCEPT: Common construction steel scrap, heavy industrial pieces
+
+metal_aluminum_sheets
+• THEME: Lightweight fabrication and consumer recycling
+• STYLE: Shiny silver metallic finish, smooth extrusion appearance
+• LAYOUT: Compact aluminum sheets, can bales, extruded profiles stacked
+• CONCEPT: Aluminum from manufacturing and consumer products
+
+metal_copper_wiring
+• THEME: Electrical and conductive material value
+• STYLE: Cooper-brown metallic coils and electrical components
+• LAYOUT: Coiled wire spools with electrical wire bundles
+• CONCEPT: Valuable electrical copper with identifying coil appearance
+
+metal_brass_fittings
+• THEME: Plumbing and decorative brass construction
+• STYLE: Gold-yellow metallic finish, machined appearance
+• LAYOUT: Brass valves, fittings, and plumbing components grouped
+• CONCEPT: Heavy brass from industrial plumbing applications
+
+metal_zinc_parts
+• THEME: Galvanizing and protective coating applications
+• STYLE: Silver metallic with blue protective coating tint
+• LAYOUT: Zinc-coated sheets, strips, and coated metal pieces
+• CONCEPT: Protective zinc coating used in manufacturing
+
+metal_stainless_panels
+• THEME: Corrosion-resistant industrial applications
+• STYLE: Polished chrome finish, clean industrial appearance
+• LAYOUT: Stainless steel panels and sheets in organized stacks
+• CONCEPT: Durable stainless steel from industrial equipment
+
+metal_iron_castings
+• THEME: Traditional foundry and casting processes
+• STYLE: Rough industrial texture, dark metallic finish
+• LAYOUT: Heavy cast iron parts, engine blocks, and rough castings
+• CONCEPT: Traditional cast iron scrap with distinctive rough texture
+
+─────────────────────────────────────────────────────────────────────────────
+
+3. SERVICE DELIVERY ICONS (Operational Equipment):
+────────────────────────────────────────────────────────
+
+container_roll_off
+• THEME: Industrial waste management and portable containers
+• STYLE: Heavy-duty construction, orange safety coloring
+• LAYOUT: Rectangular roll-off container on industrial wheels
+• CONCEPT: Forklift-accessible waste container for construction sites
+
+truck_delivery_mobile
+• THEME: Professional delivery and transportation services
+• STYLE: Blue K&L Recycling branded commercial vehicle
+• LAYOUT: Service truck with cargo bed and company identification
+• CONCEPT: Mobile pickup and delivery service vehicle
+
+hook_lift_specialized
+• THEME: Heavy equipment lifting and specialized transport
+• STYLE: Industrial hydraulic machinery, specialized equipment
+• LAYOUT: Truck with hydraulic hook mechanism for container handling
+• CONCEPT: Advanced container lifting and placement technology
+
+car_crusher_mobile
+• THEME: Vehicle recycling and heavy equipment processing
+• STYLE: Industrial crushing machinery, blue-green equipment finish
+• LAYOUT: Hydraulic car crusher system on industrial platform
+• CONCEPT: Automobile dismantling and scrap processing equipment
+
+─────────────────────────────────────────────────────────────────────────────
+
+4. NAVIGATION ESSENTIALS (App Interface):
+────────────────────────────────────────────
+
+home_dashboard
+• THEME: Multi-function application control center
+• STYLE: Grid interface layout with feature shortcuts
+• LAYOUT: 2x3 grid showing app functions (camera, services, etc.)
+• CONCEPT: One-touch access to all major app features
+
+camera_photo_estimate
+• THEME: AI-powered photography and weight estimation
+• STYLE: Smartphone camera interface with technical indicators
+• LAYOUT: Camera with overlay grid and measurement markers
+• CONCEPT: Photo capture for scrap metal weight analysis
+
+services_build
+• THEME: Industrial service offerings and equipment
+• STYLE: Professional tools and service delivery equipment
+• LAYOUT: Gear toolbox with industrial tools and equipment
+• CONCEPT: Comprehensive recycling services and capabilities
+
+locations_map
+• THEME: Geographic service coverage and facility locations
+• STYLE: Map-based interface with location markers
+• LAYOUT: Service area map showing coverage zone (Texas + Kansas)
+• CONCEPT: Multi-location network spanning two states
+
+education_school
+• THEME: Learning and information resources
+• STYLE: Educational content and knowledge sharing
+• LAYOUT: Bookshelf with recycling education materials
+• CONCEPT: Educational content for sustainable recycling practices
+
+impact_sustainability
+• THEME: Environmental achievement and sustainable goals
+• STYLE: Reward system with environmental significance
+• LAYOUT: Achievement awards with sustainability indicators
+• CONCEPT: Recognition for recycling contributions and impact
+
+─────────────────────────────────────────────────────────────────────────────
+
+DESIGN SPECIFICATIONS SUMMARY:
+═════════════════════════════
+• Resolution: 512x512px (source), 128x128px (app), 64x64px (notifications)
+• File Format: PNG with transparent background (alpha channel required)
+• Color Mode: RGB with transparency
+• Line Weight: 2-3px medium weight for clarity and performance
+• Corner Radius: 4px minimum for mobile app appearance
+• Safety Margins: 10% clear space around icon elements
+• Quality Assurance: 100% quality for crisp display, no compression artifacts
+
+AI PROMPT GENERATION TEMPLATES:
+═════════════════════════════
+Use this structure for each icon:
+
+"Create a professional industrial recycling mobile app icon showing [DETAILED CONCEPT].
+Style: Clean vector design, K&L Recycling brand colors (royal blue #0B3D91, electric blue #3B82F6),
+minimalist approach, transparent background. Optimized for 64x64px mobile interface,
+industrial heavy equipment theme, high contrast accessibility. No text or effects."
+
+END OF ICON STRATEGY & DESIGN SPECIFICATIONS

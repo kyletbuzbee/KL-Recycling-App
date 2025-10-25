@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K&L Recycling Admin Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script type="module" src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: #f8fafc;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #00bcd4, #2196f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .auth-button.sign-in {
+            background: #00bcd4;
+            color: white;
+        }
+
+        .auth-button.sign-in:hover {
+            background: #0097a7;
+            transform: translateY(-2px);
+        }
+
+        .auth-button.sign-out {
+            background: #f44336;
+            color: white;
+        }
+
+        .auth-button.sign-out:hover {
+            background: #d32f2f;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 188, 212, 0.2);
+        }
+
+        .card h3 {
+            color: #00bcd4;
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        .metric {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #00bcd4, #2196f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .metric-label {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .status-name {
+            color: #cbd5e1;
+            font-size: 0.9rem;
+        }
+
+        .status-count {
+            background: linear-gradient(135deg, #4caf50, #8bc34a);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .ml-analytics {
+            margin-top: 15px;
+        }
+
+        .accuracy-rate {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+
+        .method-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .method-name {
+            color: #cbd5e1;
+            font-size: 0.85rem;
+        }
+
+        .method-accuracy {
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-form {
+            background: rgba(30, 41, 59, 0.9);
+            border-radius: 16px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            background: rgba(15, 23, 42, 0.8);
+            color: #f8fafc;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #00bcd4;
+            box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00bcd4, #2196f3);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 188, 212, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .error-message {
+            color: #ef4444;
+            font-size: 14px;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .loading {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="loginContainer" class="login-container">
+        <div class="login-form">
+            <h2 style="text-align: center; margin-bottom: 30px; color: #00bcd4;">Admin Login</h2>
+            <div class="form-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" placeholder="admin@klrecycling.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Enter password" required>
+            </div>
+            <button class="btn btn-primary" onclick="signIn()">Sign In</button>
+            <div id="loginError" class="error-message hidden"></div>
+        </div>
+    </div>
+
+    <div id="dashboardContainer" class="container hidden">
+        <div class="header">
+            <h1>K&L Recycling Admin Dashboard</h1>
+            <div>
+                <span id="userInfo" style="margin-right: 15px; color: #94a3b8;"></span>
+                <button class="auth-button sign-out" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>📊 Total Service Requests</h3>
+                <div class="metric" id="totalRequests">-</div>
+                <div class="metric-label">All-time requests processed</div>
+            </div>
+
+            <div class="card">
+                <h3>💰 Total Revenue</h3>
+                <div class="metric" id="totalRevenue">\$0</div>
+                <div class="metric-label">Generated from services</div>
+            </div>
+
+            <div class="card">
+                <h3>👥 Total Users</h3>
+                <div class="metric" id="totalUsers">-</div>
+                <div class="metric-label">Registered app users</div>
+            </div>
+
+            <div class="card">
+                <h3>🌟 New Users (30 days)</h3>
+                <div class="metric" id="newUsers">-</div>
+                <div class="metric-label">Recent registrations</div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h3>📋 Service Request Status</h3>
+                <div id="statusGrid" class="status-grid">
+                    <div class="loading">Loading status data...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>🧠 ML Performance Analytics</h3>
+                <div class="ml-analytics">
+                    <div class="metric accuracy-rate" id="accuracyRate">0.0%</div>
+                    <div class="metric-label">Overall AI accuracy rate</div>
+
+                    <div id="methodStats" style="margin-top: 15px;">
+                        <div class="loading">Loading ML performance data...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyA546Da394WHYKLJHTET5dHl1QmZOTw8ig",
+            authDomain: "kl-website-473905.firebaseapp.com",
+            projectId: "gen-lang-client-0541313854",
+            storageBucket: "kl-recycling-app.appspot.com",
+            messagingSenderId: "671957589313",
+            appId: "1:671957589313:web:c60c9389b6e3f8bfc4c0c0"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        let currentUser = null;
+
+        // Auth state listener
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                currentUser = user;
+                console.log('User signed in:', user.email);
+
+                // Check if user is admin
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+
+                if (userData && userData.isAdmin) {
+                    showDashboard(user, userData);
+                    await loadAnalytics();
+                } else {
+                    showLogin('Access denied: Admin permissions required');
+                    auth.signOut();
+                }
+            } else {
+                currentUser = null;
+                showLogin();
+            }
+        });
+
+        // UI Functions
+        function showLogin(errorMessage = '') {
+            document.getElementById('loginContainer').classList.remove('hidden');
+            document.getElementById('dashboardContainer').classList.add('hidden');
+
+            if (errorMessage) {
+                document.getElementById('loginError').textContent = errorMessage;
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function showDashboard(user, userData) {
+            document.getElementById('loginContainer').classList.add('hidden');
+            document.getElementById('dashboardContainer').classList.remove('hidden');
+
+            const userInfo = document.getElementById('userInfo');
+            userInfo.textContent = `Logged in as: ${userData.firstName || user.email}`;
+        }
+
+        // Authentication functions
+        window.signIn = async function() {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            if (!email || !password) {
+                document.getElementById('loginError').textContent = 'Please fill in all fields';
+                document.getElementById('loginError').classList.remove('hidden');
+                return;
+            }
+
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) {
+                let errorMessage = 'Login failed. Please try again.';
+
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'No admin account found with this email.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                }
+
+                document.getElementById('loginError').textContent = errorMessage;
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        };
+
+        window.signOut = async function() {
+            try {
+                await auth.signOut();
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        };
+
+        // Handle Enter key in login form
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                signIn();
+            }
+        });
+
+        // Analytics loading
+        async function loadAnalytics() {
+            try {
+                console.log('Loading analytics data...');
+
+                // Get service requests
+                const serviceRequestsSnapshot = await db.collection('serviceRequests')
+                    .orderBy('createdAt', 'desc')
+                    .limit(1000)
+                    .get();
+
+                const serviceRequests = serviceRequestsSnapshot.docs.map(doc => ({
+                    ...doc.data(),
+                    id: doc.id
+                }));
+
+                // Get users
+                const usersSnapshot = await db.collection('users')
+                    .orderBy('createdAt', 'desc')
+                    .limit(1000)
+                    .get();
+
+                const users = usersSnapshot.docs.map(doc => doc.data());
+
+                // Get ML analysis results
+                const mlResultsSnapshot = await db.collection('mlAnalysisResults')
+                    .orderBy('createdAt', 'desc')
+                    .limit(1000)
+                    .get();
+
+                const mlResults = mlResultsSnapshot.docs.map(doc => doc.data());
+
+                // Calculate metrics
+                updateMetrics(serviceRequests, users, mlResults);
+
+            } catch (error) {
+                console.error('Error loading analytics:', error);
+                document.getElementById('totalRequests').textContent = 'Error';
+            }
+        }
+
+        function updateMetrics(serviceRequests, users, mlResults) {
+            // Update basic metrics
+            document.getElementById('totalRequests').textContent = serviceRequests.length;
+
+            // Calculate revenue (dummy rates for demo)
+            const revenueMap = {
+                'container_rental': 50.0,
+                'scrap_pickup': 100.0,
+                'equipment_rental': 200.0,
+                'consultation': 150.0,
+            };
+
+            let totalRevenue = 0;
+            serviceRequests.forEach(request => {
+                const serviceType = getServiceType(request);
+                totalRevenue += revenueMap[serviceType] || 0;
+            });
+
+            document.getElementById('totalRevenue').textContent = `$${totalRevenue.toFixed(0)}`;
+            document.getElementById('totalUsers').textContent = users.length;
+
+            // Count new users (last 30 days)
+            const thirtyDaysAgo = new Date();
+            thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+            const newUsers = users.filter(user =>
+                user.createdAt && user.createdAt.toDate() > thirtyDaysAgo
+            ).length;
+
+            document.getElementById('newUsers').textContent = newUsers;
+
+            // Update status breakdown
+            updateStatusGrid(serviceRequests);
+
+            // Update ML analytics
+            updateMlAnalytics(mlResults);
+        }
+
+        function updateStatusGrid(serviceRequests) {
+            const statusCounts = {};
+
+            serviceRequests.forEach(request => {
+                const status = request.status || 'RequestStatus.pending';
+                const cleanStatus = status.replace('RequestStatus.', '');
+                statusCounts[cleanStatus] = (statusCounts[cleanStatus] || 0) + 1;
+            });
+
+            const statusGrid = document.getElementById('statusGrid');
+            const statusItems = Object.entries(statusCounts).map(([status, count]) => `
+                <div class="status-item">
+                    <span class="status-name">${formatStatusName(status)}</span>
+                    <span class="status-count">${count}</span>
+                </div>
+            `).join('');
+
+            statusGrid.innerHTML = statusItems;
+        }
+
+        function updateMlAnalytics(mlResults) {
+            if (mlResults.length === 0) {
+                document.getElementById('accuracyRate').textContent = 'No data yet';
+                document.getElementById('methodStats').innerHTML = '<div style="color: #94a3b8; font-style: italic;">No ML analysis data available</div>';
+                return;
+            }
+
+            // Calculate overall accuracy
+            const accurateResults = mlResults.filter(result => {
+                return result.averageConfidence > 0.7 && (result.hasHighConfidenceDetection !== false);
+            });
+
+            const accuracyRate = (accurateResults.length / mlResults.length) * 100;
+            document.getElementById('accuracyRate').textContent = `${accuracyRate.toFixed(1)}%`;
+
+            // Group by method
+            const methodStats = {};
+            mlResults.forEach(result => {
+                const method = result.metadata?.modelVersion || result.method || 'Unknown';
+                if (!methodStats[method]) {
+                    methodStats[method] = { total: 0, accurate: 0 };
+                }
+                methodStats[method].total++;
+                if (result.averageConfidence > 0.7) {
+                    methodStats[method].accurate++;
+                }
+            });
+
+            // Create method stats display
+            const methodItems = Object.entries(methodStats).map(([method, stats]) => {
+                const accuracy = stats.total > 0 ? (stats.accurate / stats.total) * 100 : 0;
+                const accuracyClass = accuracy > 90 ? 'method-accuracy-high' :
+                                    accuracy > 70 ? 'method-accuracy-medium' : 'method-accuracy-low';
+
+                return `
+                    <div class="method-item">
+                        <span class="method-name">${method}</span>
+                        <span class="${accuracyClass} method-accuracy">${accuracy.toFixed(1)}%</span>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('methodStats').innerHTML = methodItems;
+        }
+
+        function getServiceType(request) {
+            const typeMap = {
+                'containerQuote': 'container_rental',
+                'scrapPickup': 'scrap_pickup',
+                'rollOffService': 'equipment_rental',
+                'emergencyService': 'consultation',
+                'wasteRemoval': 'equipment_rental',
+                'generalInquiry': 'consultation',
+            };
+            return typeMap[request.requestType] || 'consultation';
+        }
+
+        function formatStatusName(status) {
+            return status.split(/(?=[A-Z])/).join(' ').toUpperCase();
+        }
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadAnalytics, 30000);
+    </script>
+
+    <style>
+        .method-accuracy-high {
+            background: #4caf50;
+            color: white;
+        }
+        .method-accuracy-medium {
+            background: #ff9800;
+            color: white;
+        }
+        .method-accuracy-low {
+            background: #f44336;
+            color: white;
+        }
+    </style>
+</body>
+</html>

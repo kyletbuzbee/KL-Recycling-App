@@ -1,513 +1,552 @@
-import 'dart:math';
-import 'package:flutter/material.dart'; // for DateTimeRange
-import '../models/gamification.dart' as gamification;
+import 'dart:convert';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:kl_recycling_app/models/photo_estimate.dart' as models;
 
-/// Analytics service for detailed environmental impact tracking
-class AnalyticsService {
-  static const Map<String, ImpactFactor> _impactFactors = {
-    'aluminum': ImpactFactor(
-      treesSavedPerLb: 0.0005, // Based on typical aluminum recycling impact
-      energySavedPerLb: 17.0, // kWh per lb - actual data
-      co2AvoidedPerLb: 12.68, // kg CO2 per lb
-      waterSavedPerGallon: 1.34, // gallons per lb
-    ),
-    'steel': ImpactFactor(
-      treesSavedPerLb: 0.0003,
-      energySavedPerLb: 6.0,
-      co2AvoidedPerLb: 3.8,
-      waterSavedPerGallon: 0.9,
-    ),
-    'paper': ImpactFactor(
-      treesSavedPerLb: 0.0012, // Paper saves trees directly
-      energySavedPerLb: 8.5,
-      co2AvoidedPerLb: 2.1,
-      waterSavedPerGallon: 12.5,
-    ),
-    'plastic': ImpactFactor(
-      treesSavedPerLb: 0.0001,
-      energySavedPerLb: 5.0,
-      co2AvoidedPerLb: 1.4,
-      waterSavedPerGallon: 2.1,
-    ),
-    'cardboard': ImpactFactor(
-      treesSavedPerLb: 0.0008,
-      energySavedPerLb: 7.0,
-      co2AvoidedPerLb: 2.0,
-      waterSavedPerGallon: 8.0,
-    ),
-    'glass': ImpactFactor(
-      treesSavedPerLb: 0.0002,
-      energySavedPerLb: 2.5,
-      co2AvoidedPerLb: 1.8,
-      waterSavedPerGallon: 0.5,
-    ),
-    'copper': ImpactFactor(
-      treesSavedPerLb: 0.0001,
-      energySavedPerLb: 4.0,
-      co2AvoidedPerLb: 6.2,
-      waterSavedPerGallon: 1.0,
-    ),
-    'electronics': ImpactFactor(
-      treesSavedPerLb: 0.00005,
-      energySavedPerLb: 10.0,
-      co2AvoidedPerLb: 8.5,
-      waterSavedPerGallon: 1.5,
-    ),
+/// Enhanced Analytics Service for K&L Recycling Business Intelligence
+class AnalyticsService extends ChangeNotifier {
+  static const String _analyticsDataKey = 'analytics_data';
+  static const String _customerProfilesKey = 'customer_profiles';
+
+  late SharedPreferences _prefs;
+
+  // Analytics data storage
+  final List<AnalyticsEvent> _events = [];
+  final Map<String, CustomerProfile> _customerProfiles = {};
+  final Map<String, TrendData> _trends = {};
+
+  // Real-time metrics
+  AnalyticsMetrics _currentMetrics = AnalyticsMetrics.empty();
+
+  // Initialization
+  Future<void> initialize() async {
+    _prefs = await SharedPreferences.getInstance();
+    await _loadAnalyticsData();
+    await _loadCustomerProfiles();
+    await _calculateCurrentMetrics();
+    notifyListeners();
+  }
+
+  // Core functionality
+  AnalyticsMetrics get currentMetrics => _currentMetrics;
+  Map<String, CustomerProfile> get customerProfiles => Map.from(_customerProfiles);
+  Map<String, TrendData> get trends => Map.from(_trends);
+
+  /// Track customer interaction event
+  Future<void> trackEvent(AnalyticsEvent event) async {
+    _events.add(event);
+    await _processEvent(event);
+    await _saveAnalyticsData();
+
+    // Update real-time metrics
+    await _calculateCurrentMetrics();
+    notifyListeners();
+  }
+
+  /// Process photo estimate for customer analytics
+  Future<void> trackPhotoEstimate(models.PhotoEstimate estimate, {String? customerId}) async {
+    // Generate or use customer ID
+    final effectiveCustomerId = customerId ?? _generateCustomerId(estimate);
+
+    // Create analytics event
+    final event = AnalyticsEvent(
+      id: estimate.id,
+      eventType: 'photo_estimate_submitted',
+      customerId: effectiveCustomerId,
+      timestamp: estimate.timestamp,
+      data: {
+        'material_type': estimate.materialType.name,
+        'estimated_weight': estimate.estimatedWeight,
+        'location': {
+          'latitude': estimate.latitude,
+          'longitude': estimate.longitude,
+        },
+        'facility_preference': _determineFacilityPreference(estimate),
+        'value_estimate': estimate.estimatedValue,
+      },
+    );
+
+    await trackEvent(event);
+  }
+
+  /// Get customer lifetime value
+  double getCustomerLifetimeValue(String customerId) {
+    final profile = _customerProfiles[customerId];
+    if (profile == null) return 0.0;
+
+    return profile.totalValue + profile.estimatedLifetimeValue;
+  }
+
+  /// Get customer loyalty tier
+  CustomerTier getCustomerTier(String customerId) {
+    final lifetimeValue = getCustomerLifetimeValue(customerId);
+
+    if (lifetimeValue >= 10000) return CustomerTier.platinum;
+    if (lifetimeValue >= 5000) return CustomerTier.gold;
+    if (lifetimeValue >= 2000) return CustomerTier.silver;
+    return CustomerTier.bronze;
+  }
+
+  /// Get material type preferences by customer
+  Map<String, double> getCustomerMaterialPreferences(String customerId) {
+    final profile = _customerProfiles[customerId];
+    if (profile == null) return {};
+
+    final totalEstimates = profile.photoEstimateCount.toDouble();
+    if (totalEstimates == 0) return {};
+
+    return Map.fromEntries(
+      profile.materialBreakdown.entries.map(
+        (entry) => MapEntry(entry.key, entry.value / totalEstimates),
+      ),
+    );
+  }
+
+  /// Get top customers by lifetime value
+  List<CustomerProfile> getTopCustomers({int limit = 10}) {
+    return _customerProfiles.values.toList()
+      ..sort((a, b) => getCustomerLifetimeValue(b.id).compareTo(getCustomerLifetimeValue(a.id)))
+      ..take(limit);
+  }
+
+  /// Get material trends over time
+  Map<String, List<TrendPoint>> getMaterialTrends({int days = 30}) {
+    final cutoffDate = DateTime.now().subtract(Duration(days: days));
+
+    // Group estimates by material and date
+    Map<String, Map<DateTime, double>> materialDailyTotals = {};
+
+    for (final event in _events.where((e) =>
+      e.eventType == 'photo_estimate_submitted' &&
+      e.timestamp.isAfter(cutoffDate)
+    )) {
+      final materialType = event.data?['material_type'] as String?;
+      if (materialType == null) continue;
+
+      final date = DateTime(event.timestamp.year, event.timestamp.month, event.timestamp.day);
+      final weight = event.data?['estimated_weight'] as double? ?? 0.0;
+
+      materialDailyTotals.putIfAbsent(materialType, () => {});
+      materialDailyTotals[materialType]![date] = (materialDailyTotals[materialType]![date] ?? 0) + weight;
+    }
+
+    // Convert to trend points
+    return materialDailyTotals.map((material, dailyData) {
+      final trendPoints = dailyData.entries.map((entry) => TrendPoint(
+        date: entry.key,
+        value: entry.value,
+      )).toList()
+        ..sort((a, b) => a.date.compareTo(b.date));
+
+      return MapEntry(material, trendPoints);
+    });
+  }
+
+  /// Get busy times for appointment scheduling
+  List<BusyTimeSlot> getBusyTimeSlots(int daysAhead) {
+    final slots = <BusyTimeSlot>[];
+
+    // Analyze appointment patterns from events
+    for (int day = 0; day < daysAhead; day++) {
+      final date = DateTime.now().add(Duration(days: day));
+      final dayEvents = _events.where((e) =>
+        e.timestamp.year == date.year &&
+        e.timestamp.month == date.month &&
+        e.timestamp.day == date.day
+      );
+
+      // Group by hour
+      final hourlyCounts = <int, int>{};
+      for (final event in dayEvents) {
+        final hour = event.timestamp.hour;
+        hourlyCounts[hour] = (hourlyCounts[hour] ?? 0) + 1;
+      }
+
+      // Create busy slots
+      for (final entry in hourlyCounts.entries) {
+        final utilization = entry.value / 10.0; // Assume 10 slots per hour max
+        slots.add(BusyTimeSlot(
+          date: date,
+          hour: entry.key,
+          utilizationPercentage: (utilization * 100).clamp(0, 100),
+        ));
+      }
+    }
+
+    return slots;
+  }
+
+  /// Export analytics data for business reporting
+  Future<Map<String, dynamic>> exportAnalyticsData() async {
+    return {
+      'metrics': _currentMetrics.toJson(),
+      'customer_profiles': _customerProfiles.map((k, v) => MapEntry(k, v.toJson())),
+      'trends': _trends.map((k, v) => MapEntry(k, v.toJson())),
+      'events_count': _events.length,
+      'export_timestamp': DateTime.now().toIso8601String(),
+    };
+  }
+
+  // Private helper methods
+  Future<void> _processEvent(AnalyticsEvent event) async {
+    // Update customer profile
+    _updateCustomerProfile(event);
+
+    // Update trends
+    _updateTrends(event);
+  }
+
+  void _updateCustomerProfile(AnalyticsEvent event) {
+    final customerId = event.customerId;
+    final profile = _customerProfiles.putIfAbsent(customerId, () => CustomerProfile(id: customerId));
+
+    if (event.eventType == 'photo_estimate_submitted') {
+      profile.photoEstimateCount++;
+      profile.lastActivity = event.timestamp;
+
+      // Update first activity if not set
+      profile.firstActivity ??= event.timestamp;
+
+      // Update material breakdown
+      final materialType = event.data?['material_type'] as String?;
+      if (materialType != null) {
+        profile.materialBreakdown[materialType] = (profile.materialBreakdown[materialType] ?? 0) + 1;
+      }
+
+      // Update location preferences
+      final latitude = event.data?['location']?['latitude'] as double?;
+      final longitude = event.data?['location']?['longitude'] as double?;
+      if (latitude != null && longitude != null) {
+        profile.preferredLocations.add(LocationData(latitude: latitude, longitude: longitude));
+      }
+
+      // Calculate estimated lifetime value
+      profile.totalValue = profile.photoEstimateCount * 50.0; // Rough estimate
+      profile.estimatedLifetimeValue = profile.totalValue * 1.5; // Conservative projection
+    }
+  }
+
+  void _updateTrends(AnalyticsEvent event) {
+    if (event.eventType == 'photo_estimate_submitted') {
+      final materialType = event.data?['material_type'] as String?;
+      final weight = event.data?['estimated_weight'] as double?;
+      final value = event.data?['value_estimate'] as double?;
+
+      if (materialType != null) {
+        final trend = _trends.putIfAbsent(materialType, () => TrendData(
+          metric: materialType,
+          unit: 'lbs',
+          points: [],
+        ));
+
+        // Add data point for this day
+        final dateKey = DateTime(event.timestamp.year, event.timestamp.month, event.timestamp.day);
+        final existingPoint = trend.points.where((p) => p.date == dateKey).firstOrNull;
+
+        if (existingPoint != null) {
+          existingPoint.value += weight ?? 0.0;
+        } else {
+          trend.points.add(TrendPoint(date: dateKey, value: weight ?? 0.0));
+        }
+      }
+    }
+  }
+
+  Future<void> _calculateCurrentMetrics() async {
+    // Calculate metrics from events and profiles
+    final totalEstimates = _events.where((e) => e.eventType == 'photo_estimate_submitted').length;
+    final totalCustomers = _customerProfiles.length;
+    final totalValue = _customerProfiles.values.fold(0.0, (sum, profile) => sum + profile.totalValue);
+
+    // Material distribution
+    final materialCounts = <String, int>{};
+    for (final event in _events.where((e) => e.eventType == 'photo_estimate_submitted')) {
+      final materialType = event.data?['material_type'] as String?;
+      if (materialType != null) {
+        materialCounts[materialType] = (materialCounts[materialType] ?? 0) + 1;
+      }
+    }
+
+    _currentMetrics = AnalyticsMetrics(
+      totalPhotoEstimates: totalEstimates,
+      totalCustomers: totalCustomers,
+      totalEstimatedValue: totalValue,
+      materialDistribution: materialCounts,
+      averageValuePerEstimate: totalEstimates > 0 ? totalValue / totalEstimates : 0.0,
+      topMaterial: materialCounts.entries.isNotEmpty
+        ? materialCounts.entries.reduce((a, b) => a.value > b.value ? a : b).key
+        : null,
+    );
+  }
+
+  String _generateCustomerId(models.PhotoEstimate estimate) {
+    // Generate deterministic customer ID based on device/location patterns
+    // In real implementation, this would use device ID or user authentication
+    final hash = estimate.latitude?.toString() ?? estimate.longitude?.toString() ?? 'anonymous';
+    return 'cust_${hash.hashCode.abs()}';
+  }
+
+  String? _determineFacilityPreference(models.PhotoEstimate estimate) {
+    // Determine closest facility based on coordinates
+    // This is a placeholder - real implementation would calculate actual distances
+    if (estimate.latitude != null && estimate.longitude != null) {
+      return 'nearest_facility_based_on_coords';
+    }
+    return null;
+  }
+
+  Future<void> _loadAnalyticsData() async {
+    try {
+      final jsonData = _prefs.getStringList(_analyticsDataKey) ?? [];
+      for (final jsonStr in jsonData) {
+        final eventData = jsonDecode(jsonStr) as Map<String, dynamic>;
+        final event = AnalyticsEvent.fromJson(eventData);
+        _events.add(event);
+      }
+    } catch (e) {
+      debugPrint('Error loading analytics data: $e');
+    }
+  }
+
+  Future<void> _loadCustomerProfiles() async {
+    try {
+      final jsonData = _prefs.getString(_customerProfilesKey);
+      if (jsonData != null) {
+        final data = jsonDecode(jsonData) as Map<String, dynamic>;
+        for (final entry in data.entries) {
+          final profile = CustomerProfile.fromJson(entry.value as Map<String, dynamic>);
+          _customerProfiles[entry.key] = profile;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error loading customer profiles: $e');
+    }
+  }
+
+  Future<void> _saveAnalyticsData() async {
+    try {
+      // Keep only last 1000 events to prevent storage bloat
+      if (_events.length > 1000) {
+        _events.removeRange(0, _events.length - 1000);
+      }
+
+      final jsonData = _events.map((event) => jsonEncode(event.toJson())).toList();
+      await _prefs.setStringList(_analyticsDataKey, jsonData);
+
+      // Save customer profiles
+      final profileData = _customerProfiles.map((k, v) => MapEntry(k, v.toJson()));
+      await _prefs.setString(_customerProfilesKey, jsonEncode(profileData));
+
+    } catch (e) {
+      debugPrint('Error saving analytics data: $e');
+    }
+  }
+}
+
+// Supporting data models
+class AnalyticsEvent {
+  final String id;
+  final String eventType;
+  final String customerId;
+  final DateTime timestamp;
+  final Map<String, dynamic>? data;
+
+  AnalyticsEvent({
+    required this.id,
+    required this.eventType,
+    required this.customerId,
+    required this.timestamp,
+    this.data,
+  });
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'eventType': eventType,
+    'customerId': customerId,
+    'timestamp': timestamp.toIso8601String(),
+    'data': data,
   };
 
-  /// Calculate comprehensive impact from recycling history
-  static EnvironmentalImpact calculateDetailedImpact(
-    List<gamification.RecycledItem> history,
-    DateTime? startDate,
-    DateTime? endDate,
-  ) {
-    // Filter by date range if provided - use safe filtering
-    var filteredHistory = history;
-    if (startDate != null) {
-      filteredHistory = filteredHistory
-          .where((item) => item.recycledDate.isAfter(startDate))
-          .toList();
-    }
-    if (endDate != null) {
-      filteredHistory = filteredHistory
-          .where((item) => item.recycledDate.isBefore(endDate))
-          .toList();
-    }
-
-    double totalWeight = 0;
-    double totalEnergySaved = 0;
-    double totalCO2Avoided = 0;
-    double totalWaterSaved = 0;
-    int estimatedTreesSaved = 0;
-
-    Map<String, double> materialBreakdown = {};
-    Map<String, double> environmentalMetrics = {
-      'energy': 0.0,
-      'co2': 0.0,
-      'water': 0.0,
-      'trees': 0.0,
-    };
-
-    for (var item in filteredHistory) {
-      totalWeight += item.weight;
-
-      // Get the appropriate impact factor
-      final materialKey = _getMaterialKey(item.materialType);
-      final factor = _impactFactors[materialKey] ?? _impactFactors['steel']!;
-
-      // Calculate impact per item
-      final energy = item.weight * factor.energySavedPerLb;
-      final co2 = item.weight * factor.co2AvoidedPerLb;
-      final water = item.weight * factor.waterSavedPerGallon;
-      final trees = item.weight * factor.treesSavedPerLb;
-
-      // Accumulate totals
-      totalEnergySaved += energy;
-      totalCO2Avoided += co2;
-      totalWaterSaved += water;
-      estimatedTreesSaved += trees.round();
-
-      // Track material breakdown
-      materialBreakdown[materialKey] = (materialBreakdown[materialKey] ?? 0) + item.weight;
-
-      // Track environmental metrics
-      environmentalMetrics['energy'] = (environmentalMetrics['energy'] ?? 0) + energy;
-      environmentalMetrics['co2'] = (environmentalMetrics['co2'] ?? 0) + co2;
-      environmentalMetrics['water'] = (environmentalMetrics['water'] ?? 0) + water;
-      environmentalMetrics['trees'] = (environmentalMetrics['trees'] ?? 0) + trees;
-    }
-
-    return EnvironmentalImpact(
-      totalItems: filteredHistory.length,
-      totalWeight: totalWeight,
-      totalEnergySaved: totalEnergySaved,
-      totalCO2Avoided: totalCO2Avoided,
-      totalWaterSaved: totalWaterSaved,
-      estimatedTreesSaved: estimatedTreesSaved,
-      materialBreakdown: materialBreakdown,
-      environmentalMetrics: environmentalMetrics,
-      timeRange: (startDate != null && endDate != null)
-          ? DateTimeRange(start: startDate, end: endDate)
-          : null,
-      periodRecyclingHistory: filteredHistory,
-    );
-  }
-
-  /// Generate weekly analytics data for charts
-  static List<WeeklyDataPoint> generateWeeklyChartData(List<gamification.RecyclingItem> history) {
-    final now = DateTime.now();
-    final List<WeeklyDataPoint> chartData = [];
-
-    // Generate data for last 12 weeks
-    for (int i = 11; i >= 0; i--) {
-      final weekStart = now.subtract(Duration(days: i * 7));
-      final weekEnd = weekStart.add(const Duration(days: 6));
-
-      final weeklyItems = history.where((item) {
-        return item.recycledDate.isAfter(weekStart.subtract(const Duration(days: 1))) &&
-               item.recycledDate.isBefore(weekEnd.add(const Duration(days: 1)));
-      }).toList();
-
-      final weeklyImpact = calculateDetailedImpact(
-        weeklyItems,
-        weekStart,
-        weekEnd,
-      );
-
-      chartData.add(WeeklyDataPoint(
-        weekStart: weekStart,
-        weekEnd: weekEnd,
-        itemsCount: weeklyItems.length,
-        totalWeight: weeklyImpact.totalWeight,
-        energySaved: weeklyImpact.totalEnergySaved,
-        co2Avoided: weeklyImpact.totalCO2Avoided,
-        pointsEarned: weeklyItems.fold(0, (sum, item) => sum + item.points),
-      ));
-    }
-
-    return chartData;
-  }
-
-  /// Get monthly trends
-  static List<MonthlyDataPoint> generateMonthlyChartData(List<gamification.RecyclingItem> history) {
-    final List<MonthlyDataPoint> monthlyData = [];
-    final now = DateTime.now();
-
-    // Last 6 months
-    for (int i = 5; i >= 0; i--) {
-      final month = DateTime(now.year, now.month - i, 1);
-      final nextMonth = DateTime(now.year, now.month - i + 1, 1);
-
-      final monthlyItems = history.where((item) {
-        return item.recycledDate.isAfter(month.subtract(const Duration(days: 1))) &&
-               item.recycledDate.isBefore(nextMonth);
-      }).toList();
-
-      final monthlyImpact = calculateDetailedImpact(
-        monthlyItems,
-        month,
-        nextMonth.subtract(const Duration(days: 1)),
-      );
-
-      monthlyData.add(MonthlyDataPoint(
-        month: month,
-        itemsCount: monthlyItems.length,
-        totalWeight: monthlyImpact.totalWeight,
-        averageWeeklyActivity: monthlyItems.length / 4.0,
-        totalEnergySaved: monthlyImpact.totalEnergySaved,
-        totalCO2Avoided: monthlyImpact.totalCO2Avoided,
-        topMaterial: monthlyImpact.materialBreakdown.isEmpty ? 'none' :
-          monthlyImpact.materialBreakdown.entries
-            .reduce((a, b) => a.value > b.value ? a : b).key,
-      ));
-    }
-
-    return monthlyData;
-  }
-
-  /// Calculate goal progress
-  static GoalProgress calculateGoalProgress(
-    List<gamification.RecyclingItem> history,
-    double weightGoal, // lbs per month
-    int itemsGoal, // items per month
-  ) {
-    final now = DateTime.now();
-    final monthStart = DateTime(now.year, now.month, 1);
-    final monthEnd = DateTime(now.year, now.month + 1, 1);
-
-    final monthlyItems = history.where((item) {
-      return item.recycledDate.isAfter(monthStart.subtract(const Duration(days: 1))) &&
-             item.recycledDate.isBefore(monthEnd);
-    }).toList();
-
-    final currentMonthImpact = calculateDetailedImpact(
-      monthlyItems,
-      monthStart,
-      monthEnd.subtract(const Duration(days: 1)),
-    );
-
-    return GoalProgress(
-      weightGoal: weightGoal,
-      itemsGoal: itemsGoal,
-      currentWeight: currentMonthImpact.totalWeight,
-      currentItems: currentMonthImpact.totalItems,
-      remainingDaysInMonth: DateTime(now.year, now.month + 1, 1).difference(now).inDays,
-      projectedWeight: _calculateProjection(currentMonthImpact.totalWeight, now.day),
-      projectedItems: _calculateProjection(currentMonthImpact.totalItems.toDouble(), now.day),
-    );
-  }
-
-  /// Generate impact summary for sharing
-  static ImpactSummary generateImpactSummary(
-    List<gamification.RecyclingItem> history,
-    gamification.GamificationStats stats,
-  ) {
-    final totalImpact = calculateDetailedImpact(history, null, null);
-
-    return ImpactSummary(
-      totalWeight: totalImpact.totalWeight,
-      totalItems: totalImpact.totalItems,
-      totalEnergySaved: totalImpact.totalEnergySaved,
-      totalCO2Avoided: totalImpact.totalCO2Avoided,
-      totalWaterSaved: totalImpact.totalWaterSaved,
-      estimatedTreesSaved: totalImpact.estimatedTreesSaved,
-      achievementsCount: stats.earnedBadges.length,
-      topMaterial: totalImpact.materialBreakdown.isEmpty ? 'steel' :
-        totalImpact.materialBreakdown.entries
-          .reduce((a, b) => a.value > b.value ? a : b).key,
-      topAchievement: stats.earnedBadges.isEmpty ? null : stats.earnedBadges.first,
-      averageMonthlyActivity: _calculateMonthlyAverage(history, totalImpact.totalItems),
-    );
-  }
-
-  /// Generate environmental comparison data
-  static List<EnvironmentalComparison> generateEnvironmentalComparison(List<gamification.RecyclingItem> history) {
-    final totalImpact = calculateDetailedImpact(history, null, null);
-
-    // Equivalent to everyday activities
-    return [
-      EnvironmentalComparison(
-        activity: 'Car Miles',
-        impact: totalImpact.totalCO2Avoided / 0.404, // kg CO2 per mile
-        unit: 'miles not driven',
-        icon: '🚗',
-        description: 'Equivalent miles your recycling prevented',
-      ),
-      EnvironmentalComparison(
-        activity: 'Home Electricity',
-        impact: totalImpact.totalEnergySaved / 13.0, // Average home monthly usage
-        unit: 'days of electricity use',
-        icon: '⚡',
-        description: 'Equivalent electricity saved',
-      ),
-      EnvironmentalComparison(
-        activity: 'Shower Time',
-        impact: totalImpact.totalWaterSaved / 2.1, // gallons per 5-minute shower
-        unit: '5-minute showers',
-        icon: '🚿',
-        description: 'Equivalent water savings in showers',
-      ),
-      EnvironmentalComparison(
-        activity: 'Phones Charged',
-        impact: totalImpact.totalEnergySaved / 0.008, // kWh per phone charge
-        unit: 'phone charges',
-        icon: '📱',
-        description: 'Equivalent smartphone charges',
-      ),
-    ];
-  }
-
-  /// Helper to normalize material type names
-  static String _getMaterialKey(String materialType) {
-    // Normalize the material type string to match our impact factors
-    final normalized = materialType.toLowerCase().trim();
-    if (normalized.contains('aluminum')) return 'aluminum';
-    if (normalized.contains('steel') || normalized == 'other') return 'steel';
-    if (normalized.contains('copper')) return 'copper';
-    if (normalized.contains('brass')) return 'copper'; // Similar to copper
-    if (normalized.contains('zinc')) return 'steel'; // Similar to steel
-    if (normalized.contains('stainless')) return 'steel'; // Similar to steel
-    if (normalized == 'unknown') return 'steel'; // Default fallback
-
-    return 'steel'; // Default fallback for any unrecognized material
-  }
-
-  /// Calculate linear projection for remaining month days
-  static double _calculateProjection(double currentValue, int daysElapsedInMonth) {
-    const totalDaysInMonth = 30; // Approximation
-    if (daysElapsedInMonth == 0) return 0;
-
-    final dailyRate = currentValue / daysElapsedInMonth;
-    final remainingDays = totalDaysInMonth - daysElapsedInMonth;
-
-    return currentValue + (dailyRate * remainingDays);
-  }
-
-  /// Calculate average monthly activity
-  static double _calculateMonthlyAverage(List<gamification.RecyclingItem> history, int totalItems) {
-    if (history.isEmpty) return 0;
-
-    final firstDate = history.map((item) => item.recycledDate).reduce((a, b) => a.isBefore(b) ? a : b);
-    final lastDate = history.map((item) => item.recycledDate).reduce((a, b) => a.isAfter(b) ? a : b);
-    final monthsActive = max(1, lastDate.difference(firstDate).inDays ~/ 30);
-
-    return totalItems / monthsActive;
-  }
+  factory AnalyticsEvent.fromJson(Map<String, dynamic> json) => AnalyticsEvent(
+    id: json['id'],
+    eventType: json['eventType'],
+    customerId: json['customerId'],
+    timestamp: DateTime.parse(json['timestamp']),
+    data: json['data'],
+  );
 }
 
-/// Data models for analytics
+class AnalyticsMetrics {
+  final int totalPhotoEstimates;
+  final int totalCustomers;
+  final double totalEstimatedValue;
+  final Map<String, int> materialDistribution;
+  final double averageValuePerEstimate;
+  final String? topMaterial;
 
-class ImpactFactor {
-  final double treesSavedPerLb;
-  final double energySavedPerLb;
-  final double co2AvoidedPerLb;
-  final double waterSavedPerGallon;
-
-  const ImpactFactor({
-    required this.treesSavedPerLb,
-    required this.energySavedPerLb,
-    required this.co2AvoidedPerLb,
-    required this.waterSavedPerGallon,
+  AnalyticsMetrics({
+    required this.totalPhotoEstimates,
+    required this.totalCustomers,
+    required this.totalEstimatedValue,
+    required this.materialDistribution,
+    required this.averageValuePerEstimate,
+    this.topMaterial,
   });
+
+  factory AnalyticsMetrics.empty() => AnalyticsMetrics(
+    totalPhotoEstimates: 0,
+    totalCustomers: 0,
+    totalEstimatedValue: 0.0,
+    materialDistribution: {},
+    averageValuePerEstimate: 0.0,
+    topMaterial: null,
+  );
+
+  Map<String, dynamic> toJson() => {
+    'totalPhotoEstimates': totalPhotoEstimates,
+    'totalCustomers': totalCustomers,
+    'totalEstimatedValue': totalEstimatedValue,
+    'materialDistribution': materialDistribution,
+    'averageValuePerEstimate': averageValuePerEstimate,
+    'topMaterial': topMaterial,
+  };
 }
 
-class EnvironmentalImpact {
-  final int totalItems;
-  final double totalWeight;
-  final double totalEnergySaved;
-  final double totalCO2Avoided;
-  final double totalWaterSaved;
-  final int estimatedTreesSaved;
-  final Map<String, double> materialBreakdown;
-  final Map<String, double> environmentalMetrics;
-  final DateTimeRange? timeRange;
-  final List<gamification.RecyclingItem> periodRecyclingHistory;
-
-  const EnvironmentalImpact({
-    required this.totalItems,
-    required this.totalWeight,
-    required this.totalEnergySaved,
-    required this.totalCO2Avoided,
-    required this.totalWaterSaved,
-    required this.estimatedTreesSaved,
-    required this.materialBreakdown,
-    required this.environmentalMetrics,
-    this.timeRange,
-    required this.periodRecyclingHistory,
-  });
-
-  String getFormattedWeight() => '${totalWeight.toStringAsFixed(1)} lbs';
-  String getFormattedEnergy() => '${totalEnergySaved.toStringAsFixed(0)} kWh';
-  String getFormattedCO2() => '${totalCO2Avoided.toStringAsFixed(0)} kg';
-  String getFormattedWater() => '${totalWaterSaved.toStringAsFixed(0)} gal';
+enum CustomerTier {
+  bronze,
+  silver,
+  gold,
+  platinum,
 }
 
-class WeeklyDataPoint {
-  final DateTime weekStart;
-  final DateTime weekEnd;
-  final int itemsCount;
-  final double totalWeight;
-  final double energySaved;
-  final double co2Avoided;
-  final int pointsEarned;
+extension CustomerTierExtension on CustomerTier {
+  String get displayName {
+    switch (this) {
+      case CustomerTier.bronze: return 'Bronze';
+      case CustomerTier.silver: return 'Silver';
+      case CustomerTier.gold: return 'Gold';
+      case CustomerTier.platinum: return 'Platinum';
+    }
+  }
 
-  const WeeklyDataPoint({
-    required this.weekStart,
-    required this.weekEnd,
-    required this.itemsCount,
-    required this.totalWeight,
-    required this.energySaved,
-    required this.co2Avoided,
-    required this.pointsEarned,
-  });
+  Color get color {
+    switch (this) {
+      case CustomerTier.bronze: return const Color(0xFFCD7F32);
+      case CustomerTier.silver: return const Color(0xFFC0C0C0);
+      case CustomerTier.gold: return const Color(0xFFFFD700);
+      case CustomerTier.platinum: return const Color(0xFFE5E4E2);
+    }
+  }
 
-  String getWeekLabel() {
-    final startMonth = weekStart.month.toString().padLeft(2, '0');
-    final startDay = weekStart.day.toString().padLeft(2, '0');
-    final endMonth = weekEnd.month.toString().padLeft(2, '0');
-    final endDay = weekEnd.day.toString().padLeft(2, '0');
-
-    if (startMonth == endMonth) {
-      return '$startMonth/$startDay-$endDay';
-    } else {
-      return '$startMonth/$startDay-$endMonth/$endDay';
+  double get minValue {
+    switch (this) {
+      case CustomerTier.bronze: return 0;
+      case CustomerTier.silver: return 2000;
+      case CustomerTier.gold: return 5000;
+      case CustomerTier.platinum: return 10000;
     }
   }
 }
 
-class MonthlyDataPoint {
-  final DateTime month;
-  final int itemsCount;
-  final double totalWeight;
-  final double averageWeeklyActivity;
-  final double totalEnergySaved;
-  final double totalCO2Avoided;
-  final String topMaterial;
+class CustomerProfile {
+  final String id;
+  int photoEstimateCount;
+  DateTime? firstActivity;
+  DateTime? lastActivity;
+  Map<String, int> materialBreakdown;
+  List<LocationData> preferredLocations;
+  double totalValue;
+  double estimatedLifetimeValue;
 
-  const MonthlyDataPoint({
-    required this.month,
-    required this.itemsCount,
-    required this.totalWeight,
-    required this.averageWeeklyActivity,
-    required this.totalEnergySaved,
-    required this.totalCO2Avoided,
-    required this.topMaterial,
-  });
+  CustomerProfile({
+    required this.id,
+    this.photoEstimateCount = 0,
+    this.firstActivity,
+    this.lastActivity,
+    Map<String, int>? materialBreakdown,
+    List<LocationData>? preferredLocations,
+    this.totalValue = 0.0,
+    this.estimatedLifetimeValue = 0.0,
+  }) :
+    materialBreakdown = materialBreakdown ?? {},
+    preferredLocations = preferredLocations ?? [];
 
-  String getMonthLabel() {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    return '${months[month.month - 1]} ${month.year}';
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'photoEstimateCount': photoEstimateCount,
+    'firstActivity': firstActivity?.toIso8601String(),
+    'lastActivity': lastActivity?.toIso8601String(),
+    'materialBreakdown': materialBreakdown,
+    'preferredLocations': preferredLocations.map((loc) => {'lat': loc.latitude, 'lon': loc.longitude}).toList(),
+    'totalValue': totalValue,
+    'estimatedLifetimeValue': estimatedLifetimeValue,
+  };
+
+  factory CustomerProfile.fromJson(Map<String, dynamic> json) => CustomerProfile(
+    id: json['id'],
+    photoEstimateCount: json['photoEstimateCount'] ?? 0,
+    firstActivity: json['firstActivity'] != null ? DateTime.parse(json['firstActivity']) : null,
+    lastActivity: json['lastActivity'] != null ? DateTime.parse(json['lastActivity']) : null,
+    materialBreakdown: Map<String, int>.from(json['materialBreakdown'] ?? {}),
+    preferredLocations: (json['preferredLocations'] as List<dynamic>? ?? [])
+      .map((loc) => LocationData(latitude: loc['lat'], longitude: loc['lon']))
+      .toList(),
+    totalValue: json['totalValue'] ?? 0.0,
+    estimatedLifetimeValue: json['estimatedLifetimeValue'] ?? 0.0,
+  );
+
+  Duration? get customerAge {
+    if (firstActivity == null) return null;
+    return DateTime.now().difference(firstActivity!);
+  }
+
+  double get estimatedMonthlyValue {
+    if (customerAge == null || customerAge!.inDays < 30) return totalValue;
+    final months = customerAge!.inDays / 30.0;
+    return totalValue / months;
   }
 }
 
-class GoalProgress {
-  final double weightGoal;
-  final int itemsGoal;
-  final double currentWeight;
-  final int currentItems;
-  final int remainingDaysInMonth;
-  final double projectedWeight;
-  final double projectedItems;
+class LocationData {
+  final double latitude;
+  final double longitude;
 
-  const GoalProgress({
-    required this.weightGoal,
-    required this.itemsGoal,
-    required this.currentWeight,
-    required this.currentItems,
-    required this.remainingDaysInMonth,
-    required this.projectedWeight,
-    required this.projectedItems,
-  });
-
-  double get weightProgress => currentWeight / weightGoal;
-  double get itemsProgress => currentItems / itemsGoal;
-  bool get weightGoalMet => currentWeight >= weightGoal;
-  bool get itemsGoalMet => currentItems >= itemsGoal;
-  String get projectedWeightText => projectedWeight >= weightGoal ? '🎯 On track!' : '📈 Keep going!';
-  String get projectedItemsText => projectedItems >= itemsGoal ? '🎯 On track!' : '📈 Keep going!';
+  LocationData({required this.latitude, required this.longitude});
 }
 
-class ImpactSummary {
-  final double totalWeight;
-  final int totalItems;
-  final double totalEnergySaved;
-  final double totalCO2Avoided;
-  final double totalWaterSaved;
-  final int estimatedTreesSaved;
-  final int achievementsCount;
-  final String topMaterial;
-  final gamification.Badge? topAchievement;
-  final double averageMonthlyActivity;
+class TrendPoint {
+  final DateTime date;
+  double value;
 
-  const ImpactSummary({
-    required this.totalWeight,
-    required this.totalItems,
-    required this.totalEnergySaved,
-    required this.totalCO2Avoided,
-    required this.totalWaterSaved,
-    required this.estimatedTreesSaved,
-    required this.achievementsCount,
-    required this.topMaterial,
-    this.topAchievement,
-    required this.averageMonthlyActivity,
-  });
+  TrendPoint({required this.date, required this.value});
 }
 
-class EnvironmentalComparison {
-  final String activity;
-  final double impact;
+class TrendData {
+  final String metric;
   final String unit;
-  final String icon;
-  final String description;
+  final List<TrendPoint> points;
 
-  const EnvironmentalComparison({
-    required this.activity,
-    required this.impact,
+  TrendData({
+    required this.metric,
     required this.unit,
-    required this.icon,
-    required this.description,
+    required this.points,
   });
 
-  String getFormattedImpact() => '${impact.toStringAsFixed(0)} ${unit.replaceAll(' ', '')}';
+  Map<String, dynamic> toJson() => {
+    'metric': metric,
+    'unit': unit,
+    'points': points.map((p) => {'date': p.date.toIso8601String(), 'value': p.value}).toList(),
+  };
+}
+
+class BusyTimeSlot {
+  final DateTime date;
+  final int hour;
+  final double utilizationPercentage;
+
+  BusyTimeSlot({
+    required this.date,
+    required this.hour,
+    required this.utilizationPercentage,
+  });
 }

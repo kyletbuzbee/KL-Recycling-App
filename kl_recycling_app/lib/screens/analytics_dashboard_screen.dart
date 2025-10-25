@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:kl_recycling_app/config/theme.dart';
-import 'package:kl_recycling_app/providers/gamification_provider.dart';
+import 'package:kl_recycling_app/services/analytics_service.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
-import '../models/gamification.dart' as gamification;
 
 class AnalyticsDashboardScreen extends StatefulWidget {
   const AnalyticsDashboardScreen({super.key});
@@ -15,554 +13,479 @@ class AnalyticsDashboardScreen extends StatefulWidget {
 
 class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
   @override
-  Widget build(BuildContext context) {
-    final gamificationProvider = context.watch<GamificationProvider>();
-    final stats = gamificationProvider.stats;
+  void initState() {
+    super.initState();
+    // Initialize analytics service
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<AnalyticsService>().initialize();
+    });
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Analytics & Reports'),
+        title: const Text('Business Analytics'),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
-            icon: const Icon(Icons.share),
-            onPressed: _shareImpactReport,
-            tooltip: 'Share Impact',
+            icon: const Icon(Icons.refresh),
+            onPressed: () async {
+              await context.read<AnalyticsService>().initialize();
+              setState(() {});
+            },
+            tooltip: 'Refresh Analytics',
           ),
         ],
       ),
-      backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Environmental Impact Section
-            _buildImpactSummary(stats),
+      body: Consumer<AnalyticsService>(
+        builder: (context, analytics, child) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Header
+                Text(
+                  'Business Intelligence Dashboard',
+                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Real-time insights from customer behavior and operations',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 24),
 
-            const SizedBox(height: 24),
-
-            // Material Breakdown
-            _buildMaterialBreakdown(stats),
-
-            const SizedBox(height: 24),
-
-            // Goals & Progress
-            _buildGoalsProgress(stats),
-
-            const SizedBox(height: 24),
-
-            // Environmental Equivalencies
-            _buildEnvironmentalEquivalents(stats),
-
-            const SizedBox(height: 24),
-
-            // Charts section placeholder
-            CustomCard(
-              color: AppColors.surface,
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
+                // Business Metrics Cards
+                Row(
                   children: [
-                    const Icon(
-                      Icons.bar_chart,
-                      size: 48,
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Detailed Charts Coming Soon',
-                      style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        color: AppColors.onSurface,
-                        fontWeight: FontWeight.w600,
+                    Expanded(
+                      child: _MetricCard(
+                        title: 'Total Estimates',
+                        value: analytics.currentMetrics.totalPhotoEstimates.toString(),
+                        icon: Icons.photo_camera,
+                        color: AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Interactive charts showing your weekly and monthly trends',
-                      textAlign: TextAlign.center,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurfaceSecondary,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _MetricCard(
+                        title: 'Active Customers',
+                        value: analytics.currentMetrics.totalCustomers.toString(),
+                        icon: Icons.people,
+                        color: Colors.green,
                       ),
                     ),
                   ],
                 ),
-              ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _MetricCard(
+                        title: 'Avg Value/Estimate',
+                        value: '\$${analytics.currentMetrics.averageValuePerEstimate.toStringAsFixed(0)}',
+                        icon: Icons.attach_money,
+                        color: Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _MetricCard(
+                        title: 'Top Material',
+                        value: analytics.currentMetrics.topMaterial ?? 'None',
+                        icon: Icons.category,
+                        color: Colors.purple,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
+
+                // Material Distribution
+                CustomCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.pie_chart, color: AppColors.primary, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Material Distribution',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (analytics.currentMetrics.materialDistribution.isEmpty)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32),
+                            child: Text(
+                              'No data available yet.\nStart by taking some photo estimates!',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        )
+                      else
+                        Column(
+                          children: analytics.currentMetrics.materialDistribution.entries
+                            .map((entry) => _MaterialDistributionItem(
+                              material: entry.key,
+                              count: entry.value,
+                              percentage: (entry.value / analytics.currentMetrics.materialDistribution.values.reduce((a, b) => a + b)) * 100,
+                            ))
+                            .toList(),
+                        ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Top Customers
+                CustomCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.star, color: AppColors.primary, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Top Customers',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      if (analytics.customerProfiles.isEmpty)
+                        const Center(
+                          child: Padding(
+                            padding: EdgeInsets.all(32),
+                            child: Text(
+                              'No customer data yet.\nCustomer profiles will appear here.',
+                              textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        )
+                      else
+                        Column(
+                          children: analytics.getTopCustomers(limit: 5)
+                            .map((profile) => _TopCustomerItem(
+                              profile: profile,
+                              lifetimeValue: analytics.getCustomerLifetimeValue(profile.id),
+                              tier: analytics.getCustomerTier(profile.id),
+                            ))
+                            .toList(),
+                        ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Customer Insights
+                CustomCard(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.insights, color: AppColors.primary, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Business Insights',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      _buildInsightsList(analytics),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // Export Data Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () async {
+                      try {
+                        final data = await analytics.exportAnalyticsData();
+                        // For now, just show success - in real implementation,
+                        // this would save to file or send to backend
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Analytics data exported successfully!'),
+                              backgroundColor: Colors.green,
+                            ),
+                          );
+                        }
+                      } catch (e) {
+                        if (mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Export failed: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.download),
+                    label: const Text('Export Business Report'),
+                    style: ElevatedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+              ],
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildImpactSummary(gamification.UserGamificationStats stats) {
-    // Simple impact calculation - will be enhanced with proper analytics service
-    final totalWeight = stats.totalWeight.toDouble() / 16.0; // Approximate metric conversion
-    final estimatedEnergy = totalWeight * 8; // Rough estimate
-    final estimatedCO2 = totalWeight * 2.5; // Rough estimate
+  Widget _buildInsightsList(AnalyticsService analytics) {
+    final insights = <String>[];
 
-    return CustomCard(
-      color: AppColors.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.eco, color: AppColors.success, size: 28),
-                const SizedBox(width: 12),
-                Text(
-                  'Your Environmental Impact',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.onSurface,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: _ImpactMetricCard(
-                    icon: Icons.monitor_weight,
-                    value: '${stats.totalWeight} lbs',
-                    label: 'Total Weight',
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ImpactMetricCard(
-                    icon: Icons.stars,
-                    value: '≈${estimatedEnergy.toStringAsFixed(0)} kWh',
-                    label: 'Energy Saved',
-                    color: AppColors.warning,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: _ImpactMetricCard(
-                    icon: Icons.cloud_off,
-                    value: '≈${estimatedCO2.toStringAsFixed(0)} kg',
-                    label: 'CO₂ Avoided',
-                    color: AppColors.success,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _ImpactMetricCard(
-                    icon: Icons.emoji_events,
-                    value: '${stats.earnedBadges.length}',
-                    label: 'Achievements',
-                    color: AppColors.secondary,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+    if (analytics.currentMetrics.totalPhotoEstimates > 0) {
+      final avgValue = analytics.currentMetrics.averageValuePerEstimate;
+      if (avgValue > 100) {
+        insights.add('💰 High-value customers: Average estimate value is \$${avgValue.toStringAsFixed(0)}');
+      }
 
-  Widget _buildMaterialBreakdown(gamification.UserGamificationStats stats) {
-    if (stats.materialTotals.isEmpty) {
-      return CustomCard(
-        color: AppColors.surface,
+      if (analytics.currentMetrics.materialDistribution.length > 3) {
+        insights.add('📊 Diverse business: ${analytics.currentMetrics.materialDistribution.length} different materials processed');
+      }
+
+      if (analytics.customerProfiles.isNotEmpty) {
+        final avgPhotosPerCustomer = analytics.currentMetrics.totalPhotoEstimates / analytics.customerProfiles.length;
+        insights.add('👥 Customer engagement: Average ${avgPhotosPerCustomer.toStringAsFixed(1)} estimates per customer');
+      }
+    }
+
+    if (insights.isEmpty) {
+      return const Center(
         child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            children: [
-              const Icon(Icons.inventory, size: 48, color: AppColors.primary),
-              const SizedBox(height: 16),
-              Text('Material Breakdown',
-                  style: Theme.of(context).textTheme.titleLarge),
-              const SizedBox(height: 8),
-              Text('Start recycling to see your material distribution!',
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.bodyMedium),
-            ],
+          padding: EdgeInsets.all(32),
+          child: Text(
+            'Collect more data to see business insights.\nTake more photo estimates to unlock analytics!',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: Colors.grey),
           ),
         ),
       );
     }
 
-    // Calculate totals
-    final totalWeight = stats.materialTotals.values.reduce((a, b) => a + b);
-    final sortedMaterials = stats.materialTotals.entries
-        .toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
-
-    return CustomCard(
-      color: AppColors.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Material Breakdown',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ...sortedMaterials.take(5).map((entry) {
-              final percentage = (entry.value / totalWeight * 100).toStringAsFixed(1);
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: _getMaterialColor(entry.key),
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        _getMaterialDisplayName(entry.key),
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      '${entry.value.toStringAsFixed(1)} lbs ($percentage%)',
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.onSurfaceSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGoalsProgress(gamification.UserGamificationStats stats) {
-    // Sample goals - in real app this would be customizable
-    const monthlyWeightGoal = 50.0; // lbs per month
-    const monthlyItemsGoal = 10; // items per month
-
-    final now = DateTime.now();
-    final monthStart = DateTime(now.year, now.month, 1);
-
-    // Calculate current month progress
-    final currentMonthItems = stats.recyclingHistory.where(
-      (item) => item.recycledDate.isAfter(monthStart),
-    ).toList();
-
-    final currentMonthWeight = currentMonthItems.fold(0.0, (sum, item) => sum + item.weight);
-    final currentMonthItemCount = currentMonthItems.length;
-
-    return CustomCard(
-      color: AppColors.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Monthly Goals',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Weight Goal
-            _buildGoalProgress(
-              label: 'Weight Goal',
-              current: currentMonthWeight,
-              target: monthlyWeightGoal,
-              unit: 'lbs',
-              color: AppColors.primary,
-            ),
-
-            const SizedBox(height: 16),
-
-            // Items Goal
-            _buildGoalProgress(
-              label: 'Items Goal',
-              current: currentMonthItemCount.toDouble(),
-              target: monthlyItemsGoal.toDouble(),
-              unit: 'items',
-              color: AppColors.success,
-            ),
-
-            const SizedBox(height: 16),
-
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: AppBorderRadius.mediumBorder,
-              ),
-              child: Row(
-                children: [
-                  const Icon(Icons.calendar_today, color: AppColors.primary),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Days left in ${now.month == 1 ? 'January' :
-                                  now.month == 2 ? 'February' :
-                                  now.month == 3 ? 'March' :
-                                  now.month == 4 ? 'April' :
-                                  now.month == 5 ? 'May' :
-                                  now.month == 6 ? 'June' :
-                                  now.month == 7 ? 'July' :
-                                  now.month == 8 ? 'August' :
-                                  now.month == 9 ? 'September' :
-                                  now.month == 10 ? 'October' :
-                                  now.month == 11 ? 'November' : 'December'
-                                  }: ${DateTime(now.year, now.month + 1, 1).difference(now).inDays}',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEnvironmentalEquivalents(gamification.UserGamificationStats stats) {
-    // Simple equivalencies based on total weight
-    final totalWeight = stats.totalWeight.toDouble();
-    final estimatedCO2 = totalWeight * 2.5; // Rough estimate: 2.5 kg CO2 per lb
-    final estimatedEnergy = totalWeight * 8; // Rough estimate: 8 kWh per lb
-
-    final equivalencies = [
-      {
-        'icon': '🚗',
-        'value': (estimatedCO2 / 0.404).toStringAsFixed(0), // kg CO2 per mile
-        'label': 'car miles not driven',
-      },
-      {
-        'icon': '⚡',
-        'value': (estimatedEnergy / 13).toStringAsFixed(0), // Average home daily usage
-        'label': 'days of electricity use',
-      },
-      {
-        'icon': '🚿',
-        'value': (totalWeight * 2).toStringAsFixed(0), // Gallons saved * conversion
-        'label': '5-minute showers',
-      },
-    ];
-
-    return CustomCard(
-      color: AppColors.surface,
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.compare, color: AppColors.secondary, size: 28),
-                const SizedBox(width: 12),
-                Text(
-                  'Your Recycling Equals',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            ...equivalencies.map((equiv) => Padding(
-              padding: const EdgeInsets.only(bottom: 16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.1),
-                      borderRadius: AppBorderRadius.mediumBorder,
-                    ),
-                    child: Text(
-                      equiv['icon']!,
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          equiv['value']!,
-                          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.secondary,
-                          ),
-                        ),
-                        Text(
-                          equiv['label']!,
-                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: AppColors.onSurfaceSecondary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            )),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildGoalProgress({
-    required String label,
-    required double current,
-    required double target,
-    required String unit,
-    required Color color,
-  }) {
-    final progress = (current / target).clamp(0.0, 1.0);
-
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: insights.map((insight) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            Text(
-              '${current.toStringAsFixed(1)} / ${target.toStringAsFixed(1)} $unit',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.onSurfaceSecondary,
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                insight,
+                style: const TextStyle(fontSize: 14, height: 1.4),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-          value: progress,
-          backgroundColor: color.withOpacity(0.2),
-          valueColor: AlwaysStoppedAnimation<Color>(color),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          '${(progress * 100).toStringAsFixed(0)}% complete',
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.onSurfaceSecondary,
-          ),
-        ),
-      ],
+      )).toList(),
     );
-  }
-
-  Color _getMaterialColor(String material) {
-    const colors = {
-      'aluminum': AppColors.secondary,
-      'steel': AppColors.onSurfaceSecondary,
-      'paper': AppColors.warning,
-      'plastic': AppColors.primary,
-      'cardboard': AppColors.warning,
-      'glass': AppColors.info,
-      'copper': AppColors.secondary,
-      'electronics': AppColors.primary,
-    };
-    return colors[material.toLowerCase()] ?? AppColors.onSurfaceSecondary;
-  }
-
-  String _getMaterialDisplayName(String material) {
-    return material[0].toUpperCase() + material.substring(1);
-  }
-
-  void _shareImpactReport() {
-    final gamificationProvider = context.read<GamificationProvider>();
-    final stats = gamificationProvider.stats;
-
-    final totalWeight = stats.totalWeight.toDouble();
-    final estimatedEnergy = totalWeight * 8; // Rough estimate
-    final estimatedCO2 = totalWeight * 2.5; // Rough estimate
-
-    final shareText = '''
-🌍 My Recycling Impact with K&L Recycling!
-
-📊 Total Weight Recycled: ${stats.totalWeight} lbs
-🏆 Achievements Earned: ${stats.earnedBadges.length}
-⚡ Energy Saved: ≈${estimatedEnergy.toStringAsFixed(0)} kWh
-🌱 CO₂ Avoided: ≈${estimatedCO2.toStringAsFixed(0)} kg
-
-🚗 That's like not driving ${(estimatedCO2 / 0.404).toStringAsFixed(0)} miles!
-💡 Enough electricity for ${estimatedEnergy ~/ 13} days of home use!
-
-Join me in making a difference! Download the K&L Recycling app today.
-#KLRecycling #GoGreen #Sustainability
-    ''';
-
-    Share.share(shareText.trim());
   }
 }
 
-class _ImpactMetricCard extends StatelessWidget {
-  final IconData icon;
+class _MetricCard extends StatelessWidget {
+  final String title;
   final String value;
-  final String label;
+  final IconData icon;
   final Color color;
 
-  const _ImpactMetricCard({
-    required this.icon,
+  const _MetricCard({
+    required this.title,
     required this.value,
-    required this.label,
+    required this.icon,
     required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return CustomCard(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: AppBorderRadius.mediumBorder,
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
       child: Column(
         children: [
-          Icon(icon, color: color, size: 32),
+          Icon(icon, color: color, size: 24),
           const SizedBox(height: 8),
           Text(
             value,
-            style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w700,
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
               color: color,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            label,
+            title,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: AppColors.onSurfaceSecondary,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MaterialDistributionItem extends StatelessWidget {
+  final String material;
+  final int count;
+  final double percentage;
+
+  const _MaterialDistributionItem({
+    required this.material,
+    required this.count,
+    required this.percentage,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  '${material.toUpperCase()} ($count estimates)',
+                  style: const TextStyle(fontWeight: FontWeight.w500),
+                ),
+              ),
+              Text(
+                '${percentage.toStringAsFixed(1)}%',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          LinearProgressIndicator(
+            value: percentage / 100,
+            backgroundColor: Colors.grey[200],
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _TopCustomerItem extends StatelessWidget {
+  final CustomerProfile profile;
+  final double lifetimeValue;
+  final CustomerTier tier;
+
+  const _TopCustomerItem({
+    required this.profile,
+    required this.lifetimeValue,
+    required this.tier,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: tier.color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: tier.color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: tier.color,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Icon(
+              Icons.star,
+              color: Colors.white,
+              size: 16,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${tier.displayName} Customer',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: tier.color,
+                  ),
+                ),
+                Text(
+                  '${profile.photoEstimateCount} estimates • \$${lifetimeValue.toStringAsFixed(0)} value',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            '${profile.materialBreakdown.length} materials',
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ],

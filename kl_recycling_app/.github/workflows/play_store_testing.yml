@@ -1,0 +1,326 @@
+name: Play Store Testing Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  play-store-compliance-tests:
+    name: Google Play Store Compliance Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Run Google Play Store compliance tests
+      run: flutter test test/google_play.dart --coverage
+
+    - name: Run pre-launch validation tests
+      run: flutter test test/pre_launch.dart --coverage
+
+    - name: Run store listing validation tests
+      run: flutter test test/store_listing.dart --coverage
+
+    - name: Generate Play Store compliance report
+      id: generate_report
+      run: |
+        echo "## Google Play Store Compliance Report" >> $GITHUB_STEP_SUMMARY
+        echo "Generated on: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        # Run the report generation (this would need to be implemented as a CLI tool)
+        # For now, just output the test results
+        echo "### Test Results:" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Google Play Store compliance tests: PASSED" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Pre-launch validation tests: PASSED" >> $GITHUB_STEP_SUMMARY
+        echo "- ✅ Store listing validation tests: PASSED" >> $GITHUB_STEP_SUMMARY
+
+    - name: Upload compliance reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: play-store-compliance-report
+        path: |
+          test/
+          coverage/
+
+  android-device-tests:
+    name: Android Device Compatibility Tests
+    runs-on: macos-latest  # For iOS Simulator if needed
+    timeout-minutes: 30
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop')
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+        cache: true
+
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+
+    - name: Run Android integration tests
+      run: |
+        # Build APK for testing
+        flutter build apk --release
+
+        # Run device compatibility tests
+        flutter test test/android_devices.dart --coverage
+
+    - name: Upload device test reports
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: android-device-test-reports
+        path: |
+          test/
+          build/app/outputs/flutter-apk/
+
+  build-validation:
+    name: Build and APK Validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+        cache: true
+
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Install Flutter dependencies
+      run: flutter pub get
+
+    - name: Analyze code
+      run: flutter analyze
+
+    - name: Run unit tests
+      run: flutter test --coverage
+
+    - name: Build APK
+      run: flutter build apk --release --target-platform android-arm,android-arm64,android-x64
+
+    - name: Build App Bundle (AAB)
+      run: flutter build appbundle --release --target-platform android-arm,android-arm64,android-x64
+
+    - name: Validate APK
+      run: |
+        # Check APK size
+        apk_size=$(stat -c%s build/app/outputs/flutter-apk/app-release.apk)
+        max_size=$((50*1024*1024))  # 50MB max
+
+        if [ $apk_size -gt $max_size ]; then
+          echo "❌ APK size too large: $(($apk_size/1024/1024))MB (max 50MB)"
+          exit 1
+        else
+          echo "✅ APK size: $(($apk_size/1024/1024))MB"
+        fi
+
+    - name: Validate App Bundle
+      run: |
+        # Check AAB size
+        aab_size=$(stat -c%s build/app/outputs/bundle/release/app-release.aab)
+        max_size=$((150*1024*1024))  # 150MB max for Play Store
+
+        if [ $aab_size -gt $max_size ]; then
+          echo "❌ AAB size too large: $(($aab_size/1024/1024))MB (max 150MB)"
+          exit 1
+        else
+          echo "✅ AAB size: $(($aab_size/1024/1024))MB"
+        fi
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: build-artifacts
+        path: |
+          build/app/outputs/
+
+  security-tests:
+    name: Security and Privacy Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.19.0'
+        channel: 'stable'
+        cache: true
+
+    - name: Install dependencies
+      run: flutter pub get
+
+    - name: Check for hardcoded secrets
+      run: |
+        # Check for common secret patterns
+        if grep -r "password\|secret\|token\|key" --include="*.dart" . | grep -v "test\|example\|.git" | grep -E "(password|secret|token|key).*['\"]" > secrets_found.txt; then
+          echo "❌ Found potential hardcoded secrets:"
+          cat secrets_found.txt
+          exit 1
+        else
+          echo "✅ No hardcoded secrets found"
+        fi
+
+    - name: Check data collection disclosure
+      run: |
+        # Check if Firebase Analytics is used
+        if grep -r "firebase_analytics" pubspec.yaml > /dev/null; then
+          echo "📊 Firebase Analytics detected - ensure data disclosure is configured in Play Console"
+          echo "Required disclosure items:"
+          echo "- User data collected"
+          echo "- Purpose of data collection"
+          echo "- Data handling practices"
+        fi
+
+    - name: Check for secure network communications
+      run: |
+        # Check if http is used instead of https
+        if grep -r "http://" --include="*.dart" . | grep -v "test\|example" > insecure_connections.txt; then
+          echo "⚠️  Found insecure HTTP connections:"
+          cat insecure_connections.txt
+        else
+          echo "✅ No insecure HTTP connections found"
+        fi
+
+  localization-check:
+    name: Localization and Internationalization Check
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Check for localization files
+      run: |
+        if [ -d "lib/l10n" ]; then
+          echo "✅ Localization directory found"
+          ls -la lib/l10n/
+        else
+          echo "⚠️  Localization directory not found - consider adding internationalization"
+        fi
+
+    - name: Check for RTL language support
+      run: |
+        # Check if MaterialApp supports RTL
+        if grep -r "locale\|localizationsDelegates" lib/ | grep -v "test"; then
+          echo "✅ Internationalization support detected"
+        else
+          echo "⚠️  No internationalization configuration found"
+        fi
+
+  final-play-store-readiness:
+    name: Final Play Store Readiness Check
+    runs-on: ubuntu-latest
+    needs: [play-store-compliance-tests, build-validation, security-tests]
+    if: always()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Generate final readiness report
+      run: |
+        echo "# 🎯 Final Play Store Submission Readiness Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 📋 Compliance Status:" >> $GITHUB_STEP_SUMMARY
+
+        # Check job status
+        if [ "${{ needs.play-store-compliance-tests.result }}" == "success" ]; then
+          echo "✅ Google Play Store compliance tests: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Google Play Store compliance tests: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        if [ "${{ needs.build-validation.result }}" == "success" ]; then
+          echo "✅ Build and validation tests: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Build and validation tests: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        if [ "${{ needs.security-tests.result }}" == "success" ]; then
+          echo "✅ Security and privacy tests: PASSED" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ Security and privacy tests: FAILED" >> $GITHUB_STEP_SUMMARY
+        fi
+
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "## 🏪 Required Assets for Play Store Submission:" >> $GITHUB_STEP_SUMMARY
+        echo "### High Resolution App Icon:" >> $GITHUB_STEP_SUMMARY
+        echo "- File: 512x512 PNG (32-bit with alpha)" >> $GITHUB_STEP_SUMMARY
+        echo "- Status: ${CI:-\`Verify manually\`}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "### Feature Graphic:" >> $GITHUB_STEP_SUMMARY
+        echo "- Size: 1024x500 PNG/JPG" >> $GITHUB_STEP_SUMMARY
+        echo "- Status: ${CI:-\`Verify manually\`}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "### Screenshots (Phone):" >> $GITHUB_STEP_SUMMARY
+        echo "- 6-8 screenshots (360x800 to 1080x1920)" >> $GITHUB_STEP_SUMMARY
+        echo "- Status: ${CI:-\`Verify manually\`}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "### Privacy Policy:" >> $GITHUB_STEP_SUMMARY
+        echo "- URL required for all apps" >> $GITHUB_STEP_SUMMARY
+        echo "- Status: ${CI:-\`Verify manually\`}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+
+        echo "## 🎯 Overall Readiness:" >> $GITHUB_STEP_SUMMARY
+
+        # Calculate overall readiness
+        if [ "${{ needs.play-store-compliance-tests.result }}" == "success" ] && \
+           [ "${{ needs.build-validation.result }}" == "success" ] && \
+           [ "${{ needs.security-tests.result }}" == "success" ]; then
+          echo "🎉 **CONGRATULATIONS! Your app meets all automated Play Store submission requirements.**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Next Steps:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Verify visual assets meet requirements" >> $GITHUB_STEP_SUMMARY
+          echo "2. Create Google Play Developer account if not done" >> $GITHUB_STEP_SUMMARY
+          echo "3. Set up app signing in Play Console" >> $GITHUB_STEP_SUMMARY
+          echo "4. Create store listing with verified assets" >> $GITHUB_STEP_SUMMARY
+          echo "5. Submit for review!" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "❌ **ISSUES FOUND**" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Action Required:**" >> $GITHUB_STEP_SUMMARY
+          echo "Please review the failed tests above and fix any issues before Play Store submission." >> $GITHUB_STEP_SUMMARY
+        fi

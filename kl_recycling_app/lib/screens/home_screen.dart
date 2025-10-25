@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/config/constants.dart';
 import 'package:kl_recycling_app/config/animations.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
+import 'package:kl_recycling_app/providers/loyalty_provider.dart';
+import 'package:kl_recycling_app/models/loyalty.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -104,6 +107,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           ],
         ),
         actions: [
+          Consumer<LoyaltyProvider>(
+            builder: (context, loyaltyProvider, child) {
+              if (loyaltyProvider.currentTier == LoyaltyTier.bronze && loyaltyProvider.totalPoints == 0) {
+                return const SizedBox.shrink(); // Don't show for new users
+              }
+              return IconButton(
+                icon: Icon(
+                  loyaltyProvider.currentTier.icon,
+                  color: Colors.white,
+                  size: 20,
+                ),
+                onPressed: () => Navigator.pushNamed(context, '/loyalty'),
+                tooltip: '${loyaltyProvider.currentTier.title} - ${loyaltyProvider.currentPoints} points',
+              );
+            },
+          ),
+          const SizedBox(width: 8),
           IconButton(
             icon: const Icon(Icons.phone, color: Colors.white),
             onPressed: () => _callBusiness(context),

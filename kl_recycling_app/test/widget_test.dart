@@ -1,21 +1,37 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:provider/provider.dart';
 import 'package:kl_recycling_app/main.dart';
+import 'package:kl_recycling_app/providers/data_provider.dart';
 
 void main() {
-  testWidgets('App launches without errors', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const KLRecyclingApp());
+  testWidgets('App smoke test', (WidgetTester tester) async {
+    // Build our app and trigger a frame
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DataProvider()),
+      ],
+      child: const KlRecyclingApp(),
+    ));
 
-    // Verify that the app launches without crashing
+    // Verify that our app has loaded successfully
+    expect(find.byType(KlRecyclingApp), findsOneWidget);
+
+    // Wait for any async operations
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('Main screen loads', (WidgetTester tester) async {
+    await tester.pumpWidget(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => DataProvider()),
+      ],
+      child: const KlRecyclingApp(),
+    ));
+
+    await tester.pumpAndSettle();
+
+    // Verify we can find material app
     expect(find.byType(MaterialApp), findsOneWidget);
   });
 }
