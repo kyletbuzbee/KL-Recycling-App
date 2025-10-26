@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -8,6 +9,7 @@ class FirebaseService {
   static FirebaseAnalytics? _analytics;
   static FirebaseMessaging? _messaging;
   static FirebaseStorage? _storage;
+  static FirebaseFirestore? _firestore;
 
   // Getters for Firebase services
   static FirebaseAnalytics get analytics {
@@ -23,6 +25,11 @@ class FirebaseService {
   static FirebaseStorage get storage {
     _storage ??= FirebaseStorage.instance;
     return _storage!;
+  }
+
+  static FirebaseFirestore get firestore {
+    _firestore ??= FirebaseFirestore.instance;
+    return _firestore!;
   }
 
   // Initialize all Firebase services
@@ -88,6 +95,46 @@ class FirebaseService {
       await ref.delete();
     } catch (e) {
       debugPrint('Error deleting image: $e');
+    }
+  }
+
+  // Firestore methods
+  Future<Map<String, dynamic>?> getDocument(String collection, String documentId) async {
+    try {
+      final doc = await firestore.collection(collection).doc(documentId).get();
+      return doc.exists ? doc.data() : null;
+    } catch (e) {
+      debugPrint('Error getting document: $e');
+      return null;
+    }
+  }
+
+  Future<void> setDocument(String collection, String documentId, Map<String, dynamic> data) async {
+    try {
+      await firestore.collection(collection).doc(documentId).set(data);
+    } catch (e) {
+      debugPrint('Error setting document: $e');
+      throw e;
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getCollection(String collection) async {
+    try {
+      final snapshot = await firestore.collection(collection).get();
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      debugPrint('Error getting collection: $e');
+      return [];
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> queryCollection(String collection, String field, dynamic value) async {
+    try {
+      final snapshot = await firestore.collection(collection).where(field, isEqualTo: value).get();
+      return snapshot.docs.map((doc) => doc.data()).toList();
+    } catch (e) {
+      debugPrint('Error querying collection: $e');
+      return [];
     }
   }
 }

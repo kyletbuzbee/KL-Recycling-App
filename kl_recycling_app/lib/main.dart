@@ -35,14 +35,14 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Skip Firebase initialization for now to prevent crashes
-  print('Firebase initialization skipped for testing');
+  debugPrint('Firebase initialization skipped for testing');
 
   // Initialize notification service (non-Firebase)
   try {
     await NotificationService.initialize();
-    print('Notification service initialized');
+    debugPrint('Notification service initialized');
   } catch (e) {
-    print('Notification service initialization failed: $e');
+    debugPrint('Notification service initialization failed: $e');
   }
 
   runApp(
@@ -68,7 +68,7 @@ class CameraScreen extends StatefulWidget {
 
 class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver {
   late CameraProvider _cameraProvider;
-  models.PhotoQuality _currentQuality = models.PhotoQuality.fair;
+  final models.PhotoQuality _currentQuality = models.PhotoQuality.fair;
   List<String> _currentTips = [];
   bool _showTutorial = false;
   bool _isFirstTime = true;
@@ -260,7 +260,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
           Container(
             decoration: BoxDecoration(
               border: Border.all(
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
                 width: 2,
               ),
               borderRadius: BorderRadius.circular(12),
@@ -704,9 +704,7 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
                               ? 'Override AI Weight (lbs)'
                               : 'Enter Weight (lbs)',
                             border: const OutlineInputBorder(),
-                            hintText: _aiPrediction != null
-                              ? '${_aiPrediction!.estimatedWeight.toStringAsFixed(1)}'
-                              : null,
+                            hintText: _aiPrediction?.estimatedWeight.toStringAsFixed(1),
                           ),
                           keyboardType: TextInputType.number,
                           onChanged: (value) {

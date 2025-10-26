@@ -39,7 +39,7 @@ class LocationsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -169,9 +169,9 @@ class LocationsScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'We provide scrap metal recycling and container services within a ${AppConstants.serviceRadiusMiles}-mile radius of our main yard',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Color(0xFF757575),
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 16),
@@ -264,7 +264,7 @@ class LocationsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -278,11 +278,11 @@ class LocationsScreen extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  const Text(
+                  Text(
                     'Contact us for special arrangements or to discuss services beyond our regular service radius.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Color(0xFF757575),
+                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
                       height: 1.5,
                     ),
                   ),
@@ -335,8 +335,8 @@ class _ServiceAreaChip extends StatelessWidget {
         label,
         style: const TextStyle(fontSize: 14),
       ),
-      backgroundColor: AppColors.primary.withOpacity(0.1),
-      side: const BorderSide(color: Color(0xFFC8E6C9)),
+      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+      side: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
     );
   }
 }
@@ -360,7 +360,7 @@ class _InfoRow extends StatelessWidget {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
+            color: AppColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(
@@ -384,9 +384,9 @@ class _InfoRow extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 description,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
-                  color: Color(0xFF757575),
+                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                   height: 1.4,
                 ),
               ),

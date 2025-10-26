@@ -121,11 +121,11 @@ class _ContactScreenState extends State<ContactScreen> {
               ),
             ),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'We\'re here to help with all your recycling and container needs. Choose the best way to reach us.',
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.grey,
+                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
               ),
             ),
             const SizedBox(height: 24),
@@ -181,11 +181,11 @@ class _ContactScreenState extends State<ContactScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'Fill out the form below and we\'ll get back to you as soon as possible.',
                       style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey,
+                        color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -496,7 +496,7 @@ class _ContactCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

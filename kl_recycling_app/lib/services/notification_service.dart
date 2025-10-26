@@ -9,7 +9,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
-import 'package:kl_recycling_app/services/firebase_service.dart';
 
 class NotificationService {
   static const String _notificationsEnabledKey = 'notifications_enabled';

@@ -1,4 +1,5 @@
 /// Reference object types for camera calibration and scale estimation
+library;
 import 'dart:math';
 
 enum ReferenceObjectType {

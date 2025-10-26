@@ -759,7 +759,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
                   const SizedBox(height: 16),
 
                   DropdownButtonFormField<String>(
-                    value: _businessTypeController.text.isEmpty
+                    initialValue: _businessTypeController.text.isEmpty
                         ? 'construction'
                         : _businessTypeController.text,
                     decoration: const InputDecoration(
@@ -809,7 +809,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
                     children: [
                       Expanded(
                         child: DropdownButtonFormField<CustomerTier>(
-                          value: _selectedTier,
+                          initialValue: _selectedTier,
                           decoration: const InputDecoration(
                             labelText: 'Service Tier',
                             border: OutlineInputBorder(),
@@ -828,7 +828,7 @@ class _CustomerFormDialogState extends State<CustomerFormDialog> {
                       const SizedBox(width: 16),
                       Expanded(
                         child: DropdownButtonFormField<ContractStatus>(
-                          value: _selectedStatus,
+                          initialValue: _selectedStatus,
                           decoration: const InputDecoration(
                             labelText: 'Contract Status',
                             border: OutlineInputBorder(),
