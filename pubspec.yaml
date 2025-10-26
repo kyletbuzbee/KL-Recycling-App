@@ -1,0 +1,124 @@
+name: kl_recycling_mobile
+description: KL Recycling Mobile App
+
+# The following defines the version and build number for your application.
+# A version number is three numbers separated by dots, like 1.2.43
+# followed by an optional build number separated by a +.
+# Both the version and the builder number may be overridden in flutter
+# build by specifying --build-name and --build-number, respectively.
+# In Android, build-name is used as versionName while build-number used as versionCode.
+# Read more about Android versioning at https://developer.android.com/studio/publish/versioning
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
+# Read more about iOS versioning at https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+# Dependencies specify other packages that your package needs in order to work.
+# To automatically upgrade your package dependencies to the latest versions
+# consider running `flutter pub upgrade --major-versions`. Alternatively,
+# view the documentation to learn more about dependencies and their system.
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # The following adds the Cupertino Icons font to your application.
+  # Use with the CupertinoIcons class for iOS style icons.
+  cupertino_icons: ^1.0.2
+
+
+
+  # State Management
+  provider: ^6.1.1
+
+  # HTTP requests and network
+  http: ^1.2.0
+  connectivity_plus: ^5.0.2
+
+  # Storage
+  shared_preferences: ^2.2.2
+  path_provider: ^2.1.2
+
+  # Images and media
+  image_picker: ^1.0.7
+  cached_network_image: ^3.3.1
+
+  # Maps and location
+  google_maps_flutter: ^2.5.3
+  geolocator: ^11.0.0
+
+  # URL launching
+  url_launcher: ^6.2.2
+
+  # Utilities
+  intl: ^0.19.0
+
+  # Logging and Error Reporting
+  logging: ^1.2.0
+  sentry_flutter: ^7.17.0
+
+  # Environment configuration
+  flutter_dotenv: ^5.1.0
+
+  # Validation
+  email_validator: ^2.1.17
+
+  # Security
+  flutter_secure_storage: ^9.0.0
+
+  # UI Enhancements
+  shimmer: ^3.0.0
+  fluttertoast: ^8.2.4
+
+  # Local Notifications (replacing Firebase Messaging)
+  flutter_local_notifications: ^16.3.3
+
+# Firebase
+  firebase_core: ^3.6.0
+  firebase_core_web: ^2.24.1
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+  firebase_storage: ^12.3.4
+  firebase_analytics: ^11.3.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  integration_test:
+    sdk: flutter
+
+  # The "flutter_lints" package below contains a set of recommended lints to
+  # encourage good coding practices. The lint set provided by the float column is
+  # available in the `analysis_options.yaml` file shipped with the Flutter create
+  # template. To see more detailed descriptions of the
+  # available lints, visit: <link>https://flutter.dev/docs/manifest/analysis-options#enabling-the-code-lints</link>
+  flutter_lints: ^2.0.0
+
+# For information on the generic Dart part of this file, see the
+# following page: https://dart.dev/tools/pub/pubspec
+
+# The following section is specific to Flutter packages.
+flutter:
+
+  # The following line ensures that the Material Icons font is
+  # included with your application, so that you can use the icons in
+  # the material Icons class.
+  uses-material-design: true
+
+  # To add assets to your application, add an assets section, like this:
+  assets:
+    - .env
+  # - images/a_dot_burr.jpeg
+  # - images/a_dot_ham.jpeg
+
+  # An image asset can refer to one or more resolution-specific "variants", see
+  # https://flutter.dev/assets-and-images/#resolution-aware
+
+  # For details regarding adding assets from package dependencies, see
+  # https://flutter.dev/assets-and-images/#from-packages
+
+  # Custom fonts will be added when font assets are available
+  # See https://flutter.dev/custom-fonts/#from-packages

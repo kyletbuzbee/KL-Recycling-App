@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:camera/camera.dart';
 import 'package:kl_recycling_app/config/theme.dart';
+import 'package:kl_recycling_app/utils/logger.dart';
 import 'package:kl_recycling_app/config/constants.dart';
 import 'package:kl_recycling_app/providers/camera_provider.dart';
 import 'package:kl_recycling_app/providers/business_customer_provider.dart';
@@ -24,6 +25,7 @@ import 'package:kl_recycling_app/services/offline_manager.dart';
 import 'package:kl_recycling_app/services/analytics_service.dart';
 import 'package:kl_recycling_app/services/appointment_service.dart';
 import 'package:kl_recycling_app/services/enhanced_analytics_service.dart';
+import 'package:kl_recycling_app/services/analytics_monitoring_service.dart';
 import 'package:kl_recycling_app/providers/auth_provider.dart';
 import 'package:kl_recycling_app/providers/loyalty_provider.dart';
 import 'package:kl_recycling_app/services/auth_service.dart';
@@ -57,21 +59,29 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    print('Firebase initialized successfully');
+    AppLogger.i('Firebase initialized successfully');
 
     // Initialize Firebase services
     await FirebaseService.initialize();
-    print('Firebase services initialized');
+    AppLogger.i('Firebase services initialized');
   } catch (e) {
-    print('Firebase initialization failed: $e');
+    AppLogger.e('Firebase initialization failed: $e');
   }
 
   // Initialize notification service
   try {
     await NotificationService.initialize();
-    print('Notification service initialized');
+    AppLogger.i('Notification service initialized');
   } catch (e) {
-    print('Notification service initialization failed: $e');
+    AppLogger.e('Notification service initialization failed: $e');
+  }
+
+  // Initialize analytics monitoring service
+  try {
+    await AnalyticsMonitoringService().initialize();
+    AppLogger.i('Analytics monitoring service initialized');
+  } catch (e) {
+    AppLogger.e('Analytics monitoring service initialization failed: $e');
   }
 
   runApp(
@@ -84,15 +94,19 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AnalyticsService()),
         ChangeNotifierProvider(create: (_) => AppointmentService()),
         ChangeNotifierProvider(create: (_) => EnhancedAnalyticsService()),
+
+        // Services should be defined before providers that depend on them
         ChangeNotifierProvider(create: (_) => LoyaltyService()),
+        Provider<AuthService>(create: (_) => AuthService()),
+
+        // ProxyProviders that depend on services
         ChangeNotifierProxyProvider<LoyaltyService, LoyaltyProvider>(
           create: (context) => LoyaltyProvider(context.read<LoyaltyService>()),
           update: (_, loyaltyService, loyaltyProvider) => loyaltyProvider!..loyaltyService = loyaltyService,
         ),
-        ChangeNotifierProvider(create: (_) => AuthService()),
-        ProxyProvider<AuthService, AuthProvider>(
+        ChangeNotifierProxyProvider<AuthService, AuthProvider>(
           create: (context) => AuthProvider(context.read<AuthService>()),
-          update: (context, authService, previous) => AuthProvider(authService),
+          update: (context, authService, previous) => previous ?? AuthProvider(authService),
         ),
       ],
       child: const KLRecyclingApp(),
@@ -167,7 +181,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
         });
       }
     } catch (e) {
-      debugPrint('Error checking first-time user: $e');
+      AppLogger.w('Error checking first-time user: $e');
     }
   }
 
@@ -229,7 +243,7 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
 
       return CameraPreview(controller);
     } catch (e) {
-      debugPrint('Camera preview error: $e');
+      AppLogger.w('Camera preview error: $e');
       return Container(
         color: Colors.black45,
         child: const Center(
@@ -347,12 +361,12 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                       color: AppColors.primary,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         width: 4,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -425,10 +439,10 @@ class _PhotoPreviewScreenState extends State<PhotoPreviewScreen> {
 
       // Show success message for initialization instead of running analysis
       if (mounted) {
-        debugPrint('AI service ready - select material type to analyze');
+        AppLogger.d('AI service ready - select material type to analyze');
       }
     } catch (e) {
-      debugPrint('AI service initialization failed: $e');
+      AppLogger.e('AI service initialization failed: $e');
       // Continue with manual estimation only
       setState(() {
         _serviceInitialized = false;
@@ -1258,7 +1272,7 @@ class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.6)
+      ..color = Colors.white.withValues(alpha: 0.6)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 

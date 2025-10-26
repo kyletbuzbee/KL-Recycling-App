@@ -3,17 +3,50 @@ import 'package:provider/provider.dart';
 import 'package:kl_recycling_app/providers/loyalty_provider.dart';
 import 'package:kl_recycling_app/models/loyalty.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
+import 'package:kl_recycling_app/config/theme.dart';
 
-class LoyaltyDashboardScreen extends StatelessWidget {
+class LoyaltyDashboardScreen extends StatefulWidget {
   const LoyaltyDashboardScreen({super.key});
+
+  @override
+  State<LoyaltyDashboardScreen> createState() => _LoyaltyDashboardScreenState();
+}
+
+class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
+  bool _localInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeProvider();
+    // Use addPostFrameCallback to safely access the provider after the first frame.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // Check if the provider is already loading to avoid redundant calls.
+      if (!context.read<LoyaltyProvider>().isLoading) {
+        // Initialize with a demo user ID for testing.
+        context.read<LoyaltyProvider>().initializeForUser('demo_user_123');
+      }
+    });
+  }
+
+  Future<void> _initializeProvider() async {
+    final provider = context.read<LoyaltyProvider>();
+    // Initialize with a demo user ID for testing
+    await provider.initializeForUser('demo_user_123');
+    if (mounted) {
+      setState(() {
+        _localInitialized = true;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Loyalty Program'),
-        backgroundColor: Theme.of(context).primaryColor,
-        foregroundColor: Colors.white,
+        backgroundColor: AppColors.primary,
+        foregroundColor: AppColors.onPrimary,
       ),
       body: Consumer<LoyaltyProvider>(
         builder: (context, loyaltyProvider, child) {
@@ -56,7 +89,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
           gradient: LinearGradient(
             colors: [
               Theme.of(context).primaryColor,
-              Theme.of(context).primaryColor.withOpacity(0.7),
+              Theme.of(context).primaryColor.withValues(alpha: 0.7),
             ],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
@@ -103,7 +136,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
@@ -184,7 +217,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontSize: 12,
             color: Colors.grey.shade600,
           ),
@@ -221,7 +254,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               progressText,
-              style: TextStyle(
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                 fontSize: 14,
                 color: Colors.grey.shade600,
               ),
@@ -253,7 +286,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
                             ? Theme.of(context).primaryColor
                             : isCompleted
                                 ? Colors.green
-                                : Colors.grey.shade600,
+                                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                       ),
                     ),
                   ],
@@ -438,7 +471,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
                 ),
                 Text(
                   _formatDate(point.createdAt),
-                  style: TextStyle(
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
                     fontSize: 12,
                     color: Colors.grey.shade600,
                   ),
@@ -512,7 +545,7 @@ class LoyaltyDashboardScreen extends StatelessWidget {
         ),
         Text(
           label,
-          style: TextStyle(
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
             fontSize: 12,
             color: Colors.grey.shade600,
           ),

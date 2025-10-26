@@ -32,12 +32,6 @@ class _ReferralProgramScreenState extends State<ReferralProgramScreen> {
   }
 
   @override
-  void dispose() {
-    _codeController.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -266,8 +260,9 @@ class _ReferralProgramScreenState extends State<ReferralProgramScreen> {
 
   void _shareReferral() {
     const String referralMessage =
-      'Join me at K&L Recycling! Use my referral code to get started and earn rewards. '
-      'Download the app and enter code: WELCOME2024';
+      'Join K&L Recycling for professional scrap metal recycling services! '
+      'Use code KL2024 to get started with our loyalty program and earn points on every load. '
+      'Download our app for instant estimates and convenient scheduling.';
 
     Share.share(referralMessage);
   }

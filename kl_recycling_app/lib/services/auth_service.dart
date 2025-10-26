@@ -4,6 +4,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user.dart' as app_user;
+import '../utils/logger.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -77,7 +78,7 @@ class AuthService {
       await _firestore.collection(_rateLimitCollection).doc(email).delete();
     } catch (e) {
       // Don't throw - cleanup failure is non-critical
-      debugPrint('Failed to reset rate limit: $e');
+      AppLogger.w('Failed to reset rate limit: $e');
     }
   }
 

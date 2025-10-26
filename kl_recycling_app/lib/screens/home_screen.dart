@@ -65,10 +65,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               height: 44,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white, width: 2),
+                border: Border.all(color: AppColors.onPrimary, width: 2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
+                    color: AppColors.onSurface.withValues(alpha: 0.2),
                     blurRadius: 4,
                     offset: const Offset(0, 2),
                   ),
@@ -77,14 +77,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(7),
                 child: Container(
-                  color: Colors.white,
+                  color: AppColors.surface.withValues(alpha: 0.95),
                   padding: const EdgeInsets.all(2),
                   child: Image.asset(
                     AppConstants.logoPath,
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        color: Colors.white,
+                        color: AppColors.surface.withValues(alpha: 0.95),
                         child: const Icon(
                           Icons.business,
                           color: AppColors.primary,
@@ -163,8 +163,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  AppColors.primary.withOpacity(0.3),
-                                  AppColors.primary.withOpacity(0.1),
+                                  AppColors.primary.withValues(alpha: 0.3),
+                                  AppColors.primary.withValues(alpha: 0.1),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,

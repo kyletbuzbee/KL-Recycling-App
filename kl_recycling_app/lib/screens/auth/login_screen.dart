@@ -92,17 +92,17 @@ class _LoginScreenState extends State<LoginScreen> {
         Container(
           padding: const EdgeInsets.all(24),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.15),
+            color: AppColors.onPrimary.withValues(alpha: 0.15),
             borderRadius: AppBorderRadius.largeBorder,
             border: Border.all(
-              color: Colors.white.withOpacity(0.2),
+              color: AppColors.onPrimary.withValues(alpha: 0.2),
               width: 2,
             ),
           ),
           child: Icon(
             Icons.business,
             size: 64,
-            color: Colors.white,
+            color: AppColors.onPrimary,
           ),
         ),
         const SizedBox(height: 16),
@@ -111,10 +111,10 @@ class _LoginScreenState extends State<LoginScreen> {
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: AppColors.onPrimary,
             shadows: [
               Shadow(
-                color: Colors.black.withOpacity(0.3),
+                color: Colors.black.withValues(alpha: 0.3),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -332,28 +332,28 @@ class _LoginScreenState extends State<LoginScreen> {
       children: [
         Row(
           children: [
-            Expanded(
-              child: Divider(
-                color: Colors.white.withOpacity(0.3),
-                thickness: 1,
+          Expanded(
+            child: Divider(
+              color: AppColors.onPrimary.withValues(alpha: 0.3),
+              thickness: 1,
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              'Or sign in with',
+              style: TextStyle(
+                color: AppColors.onPrimary.withValues(alpha: 0.7),
+                fontSize: 14,
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Or sign in with',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
-                  fontSize: 14,
-                ),
-              ),
+          ),
+          Expanded(
+            child: Divider(
+              color: AppColors.onPrimary.withValues(alpha: 0.3),
+              thickness: 1,
             ),
-            Expanded(
-              child: Divider(
-                color: Colors.white.withOpacity(0.3),
-                thickness: 1,
-              ),
-            ),
+          ),
           ],
         ),
 
@@ -427,7 +427,7 @@ class _LoginScreenState extends State<LoginScreen> {
           'By signing in, you agree to our',
           textAlign: TextAlign.center,
           style: TextStyle(
-            color: Colors.white.withOpacity(0.7),
+            color: AppColors.onPrimary.withValues(alpha: 0.7),
             fontSize: 14,
           ),
         ),
@@ -440,13 +440,13 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               child: Text(
                 'Terms & Conditions',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.onPrimary),
               ),
             ),
             Text(
               ' and ',
               style: TextStyle(
-                color: Colors.white.withOpacity(0.7),
+                color: AppColors.onPrimary.withValues(alpha: 0.7),
                 fontSize: 14,
               ),
             ),
@@ -456,7 +456,7 @@ class _LoginScreenState extends State<LoginScreen> {
               },
               child: Text(
                 'Privacy Policy',
-                style: TextStyle(color: Colors.white),
+                style: TextStyle(color: AppColors.onPrimary),
               ),
             ),
           ],

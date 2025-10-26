@@ -1,0 +1,10 @@
+md src\api
+md src\assets
+md src\components
+md src\constants
+md src\context
+md src\hooks
+md src\navigation
+md src\screens
+md src\styles
+md src\utils

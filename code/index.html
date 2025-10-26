@@ -1,0 +1,30 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>K&L Recycling Customer Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom font from Google Fonts */
+      @import url('https://fonts.googleapis.com/css2?family=Lato:wght@400;700;900&display=swap');
+      body {
+        font-family: 'Lato', sans-serif;
+      }
+    </style>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@18.3.1",
+          "react-dom/client": "https://esm.sh/react-dom@18.3.1/client",
+          "@google/generative-ai": "https://esm.sh/@google/generative-ai"
+        }
+      }
+    </script>
+  </head>
+  <body class="bg-gray-100">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>

@@ -1,0 +1,8 @@
+
+{
+  "name": "K&L Recycling Customer Portal",
+  "description": "A comprehensive customer portal for K&L Recycling. Get AI-powered photo estimates for scrap metal, schedule pickups, and learn about our core services like mobile car crushing, oil & gas demolition, and roll-off containers.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

@@ -220,7 +220,7 @@ class AdminService {
       // Service type breakdown
       final serviceTypeCounts = <String, int>{};
       for (final request in serviceRequests) {
-        final serviceTypeString = ServiceRequestExtension(request).serviceType;
+        final serviceTypeString = _getServiceType(request);
         serviceTypeCounts[serviceTypeString] = (serviceTypeCounts[serviceTypeString] ?? 0) + 1;
       }
 
@@ -234,7 +234,7 @@ class AdminService {
 
       double totalRevenue = 0;
       for (final request in serviceRequests) {
-        final rate = revenueMap[ServiceRequestExtension(request).serviceType] ?? 0.0;
+        final rate = revenueMap[_getServiceType(request)] ?? 0.0;
         totalRevenue += rate;
       }
 

@@ -48,6 +48,11 @@ class MlAnalysisResult {
     );
   }
 
+  factory MlAnalysisResult.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>;
+    return MlAnalysisResult.fromMap(doc.id, data);
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'photoId': photoId,

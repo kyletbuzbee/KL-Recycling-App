@@ -1,0 +1,147 @@
+# ============================================================================
+# Flutter / Dart
+# ============================================================================
+# Flutter/Dart/Pub related
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+flutter_*.log
+
+# Android
+android/app/build/
+android/build/
+android/gradle/wrapper/gradle-wrapper.jar
+android/gradlew
+android/gradlew.bat
+*.keystore
+*.jks
+.gradle/
+
+# iOS
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/build/
+*.pbxuser
+!default.pbxuser
+*.mode1v3
+!default.mode1v3
+*.mode2v3
+!default.mode2v3
+*.perspectivev3
+!default.perspectivev3
+xcuserdata/
+*.moved-aside
+*.xccheckout
+*.xcscmblueprint
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ============================================================================
+# Node.js / Firebase Functions
+# ============================================================================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Logs
+logs/
+*.log
+firebase-debug.log
+firestore-debug.log
+
+# Build artifacts
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Temporary files
+.cache/
+*.tmp
+*.temp
+
+# ============================================================================
+# Backend Uploads
+# ============================================================================
+backend/uploads/
+!backend/uploads/.gitkeep
+functions/uploads/
+!functions/uploads/.gitkeep
+
+# ============================================================================
+# OS Generated Files
+# ============================================================================
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Windows
+Thumbs.db
+ehthumbs.db
+*.stackdump
+
+# Linux
+*~
+
+# ============================================================================
+# Firebase
+# ============================================================================
+.firebase/
+firebase-debug.log
+firestore-debug.log
+.firebase.json.backup
+
+# ============================================================================
+# Secrets and Keys
+# ============================================================================
+secrets.json
+config/keys.js
+android/app/google-services.json
+backend/.env
+functions/.env
+
+# ============================================================================
+# Build Artifacts
+# ============================================================================
+*.apk
+*.ipa
+*.aab
+*.app
+*.dSYM
+*.framework
+
+# ============================================================================
+# Testing
+# ============================================================================
+coverage/
+.coverage/
+*.gcno
+*.gcda
+
+# ============================================================================
+# Temporary Databases
+# ============================================================================
+*.db
+*.sqlite
+*.sqlite3
+src/tmp/

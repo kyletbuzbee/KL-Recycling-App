@@ -195,8 +195,7 @@ class SpecializedServicesTab extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
           'Expert handling of specific materials and equipment',
-          style: TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: AppColors.onSurfaceSecondary,
           ),
         ),
@@ -215,18 +214,17 @@ class EquipmentServicesTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        const Text(
+        Text(
           'Equipment Rentals',
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: AppColors.onSurface,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           'Heavy equipment and containers for large-scale projects',
-          style: TextStyle(
-            fontSize: 16,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
             color: AppColors.onSurfaceSecondary,
           ),
         ),
@@ -263,17 +261,10 @@ class ServiceCard extends StatelessWidget {
               child: Container(
                 height: 160,
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Theme.of(context).primaryColor.withOpacity(0.2),
-                      Theme.of(context).primaryColor.withOpacity(0.1),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: AppColors.primary.withValues(alpha: 0.05),
                   borderRadius: AppBorderRadius.mediumBorder,
                   border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                    color: AppColors.primary.withValues(alpha: 0.15),
                     width: 1,
                   ),
                 ),
@@ -284,10 +275,10 @@ class ServiceCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.surface.withOpacity(0.9),
+                          color: AppColors.surface.withValues(alpha: 0.9),
                           borderRadius: AppBorderRadius.largeBorder,
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
@@ -346,7 +337,7 @@ class ServiceCard extends StatelessWidget {
             AppAnimations.slideUp(
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                children: (service['features'] as List<dynamic>).asMap().entries.map((entry) =>
+                children: (service['features'] as List<dynamic>).map((feature) =>
                   Padding(
                     padding: const EdgeInsets.only(bottom: 8),
                     child: Row(
@@ -364,7 +355,7 @@ class ServiceCard extends StatelessWidget {
                         const SizedBox(width: 12),
                         Expanded(
                           child: Text(
-                            entry.value.toString(),
+                            feature.toString(),
                             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppColors.onSurfaceSecondary,
                               height: 1.5,
@@ -402,10 +393,10 @@ class ServiceCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: AppBorderRadius.smallBorder,
                       border: Border.all(
-                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        color: AppColors.primary.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),
@@ -413,7 +404,7 @@ class ServiceCard extends StatelessWidget {
                       size.toString(),
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
-                        color: Theme.of(context).primaryColor,
+                        color: AppColors.primary,
                       ),
                     ),
                   ),

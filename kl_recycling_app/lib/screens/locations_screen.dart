@@ -31,7 +31,7 @@ class LocationsScreen extends StatelessWidget {
             // Main Location Card
             CustomCard(
               padding: const EdgeInsets.all(24),
-              color: Colors.white,
+              color: AppColors.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -40,7 +40,7 @@ class LocationsScreen extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Icon(
@@ -162,7 +162,7 @@ class LocationsScreen extends StatelessWidget {
             // All K&L Recycling Locations
             CustomCard(
               padding: const EdgeInsets.all(20),
-              color: Colors.white,
+              color: AppColors.surface,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -302,7 +302,7 @@ class LocationsScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Column(
@@ -365,10 +365,10 @@ class LocationsScreen extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+        border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.onSurface.withValues(alpha: 0.1),
             blurRadius: 2,
             offset: const Offset(0, 1),
           ),
@@ -379,16 +379,16 @@ class LocationsScreen extends StatelessWidget {
         children: [
           Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: AppColors.primary.withOpacity(0.2),
-                    width: 1,
-                  ),
-                ),
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
                 child: Icon(
                   Icons.business,
                   size: 20,
@@ -411,7 +411,7 @@ class LocationsScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primary.withOpacity(0.3),
+                                color: AppColors.primary.withValues(alpha: 0.3),
                                   blurRadius: 2,
                                   offset: const Offset(0, 1),
                                 ),
@@ -451,10 +451,10 @@ class LocationsScreen extends StatelessWidget {
                       children: (location['services'] as List).map<Widget>((service) => Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.08),
+                          color: AppColors.primary.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.25),
+                            color: AppColors.primary.withValues(alpha: 0.25),
                             width: 1,
                           ),
                         ),
@@ -533,9 +533,9 @@ class _ServiceAreaChip extends StatelessWidget {
           fontWeight: FontWeight.w600,
         ),
       ),
-      backgroundColor: AppColors.primary.withOpacity(0.08),
+      backgroundColor: AppColors.primary.withValues(alpha: 0.08),
       side: BorderSide(
-        color: AppColors.primary.withOpacity(0.25),
+        color: AppColors.primary.withValues(alpha: 0.25),
         width: 1,
       ),
       padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
@@ -561,10 +561,10 @@ class _InfoRow extends StatelessWidget {
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
           child: Icon(
             icon,
             size: 20,
@@ -587,7 +587,7 @@ class _InfoRow extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 description,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 14,
                   height: 1.4,
                   color: AppColors.onSurfaceSecondary,
