@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/config/constants.dart';
-import 'package:kl_recycling_app/config/animations.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
 
 class ContactScreen extends StatefulWidget {

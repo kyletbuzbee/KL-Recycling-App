@@ -132,7 +132,7 @@ class _AddCustomerFormScreenState extends State<AddCustomerFormScreen> {
               const SizedBox(height: 16),
 
               DropdownButtonFormField<String>(
-                value: _businessTypeController.text.isEmpty
+                initialValue: _businessTypeController.text.isEmpty
                     ? 'construction'
                     : _businessTypeController.text,
                 decoration: const InputDecoration(
@@ -184,7 +184,7 @@ class _AddCustomerFormScreenState extends State<AddCustomerFormScreen> {
                 children: [
                   Expanded(
                     child: DropdownButtonFormField<CustomerTier>(
-                      value: _selectedTier,
+                      initialValue: _selectedTier,
                       decoration: const InputDecoration(
                         labelText: 'Service Tier',
                         prefixIcon: Icon(Icons.star),
@@ -204,7 +204,7 @@ class _AddCustomerFormScreenState extends State<AddCustomerFormScreen> {
                   const SizedBox(width: 16),
                   Expanded(
                     child: DropdownButtonFormField<ContractStatus>(
-                      value: _selectedStatus,
+                      initialValue: _selectedStatus,
                       decoration: const InputDecoration(
                         labelText: 'Contract Status',
                         prefixIcon: Icon(Icons.assignment),

@@ -31,7 +31,7 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
     with TickerProviderStateMixin {
   late AnimationController _fadeController;
   late Animation<double> _fadeAnimation;
-  bool _showAdvancedTips = false;
+  final bool _showAdvancedTips = false;
 
   @override
   void initState() {

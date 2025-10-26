@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:kl_recycling_app/models/loyalty.dart';
 import 'package:kl_recycling_app/services/loyalty_service.dart';
+import 'package:kl_recycling_app/providers/theme_provider.dart';
 
 /// Result wrapper classes for provider operations
 class LeaderboardEntry {
@@ -69,8 +70,9 @@ class ReferralResult {
 /// Provider class for managing loyalty program state
 class LoyaltyProvider extends ChangeNotifier {
   final LoyaltyService _loyaltyService;
+  final ThemeProvider? _themeProvider;
 
-  LoyaltyProvider(this._loyaltyService);
+  LoyaltyProvider(this._loyaltyService, [this._themeProvider]);
 
   // State variables
   LoyaltyProfile? _currentProfile;
@@ -136,9 +138,15 @@ class LoyaltyProvider extends ChangeNotifier {
     try {
       _currentProfile = await _loyaltyService.getLoyaltyProfile(userId);
       await _loadAdditionalData();
+
+      // Update theme based on user points
+      _updateThemeFromPoints(totalPoints);
     } catch (e) {
       _currentProfile = await _loyaltyService.initializeUserProfile(userId);
       _errorMessage = 'Initialized new profile';
+
+      // Update theme for new user
+      _updateThemeFromPoints(totalPoints);
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -183,6 +191,9 @@ class LoyaltyProvider extends ChangeNotifier {
         availablePoints: _currentProfile!.availablePoints + points,
         pointsHistory: [..._currentProfile!.pointsHistory, pointEntry],
       );
+
+      // Update theme based on new points total
+      _updateThemeFromPoints(totalPoints);
 
       notifyListeners();
       return PointsResult(success: true, earnedPoints: points);
@@ -280,5 +291,12 @@ class LoyaltyProvider extends ChangeNotifier {
   void clearError() {
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// Update theme based on current user points total
+  void _updateThemeFromPoints(int points) {
+    if (_themeProvider != null) {
+      _themeProvider!.updateTierFromPoints(points);
+    }
   }
 }
