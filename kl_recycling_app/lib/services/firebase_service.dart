@@ -114,7 +114,7 @@ class FirebaseService {
       await firestore.collection(collection).doc(documentId).set(data);
     } catch (e) {
       debugPrint('Error setting document: $e');
-      throw e;
+      rethrow;
     }
   }
 

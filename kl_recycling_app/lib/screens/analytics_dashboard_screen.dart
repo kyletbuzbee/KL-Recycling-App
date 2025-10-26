@@ -43,18 +43,18 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
 
             const SizedBox(height: 24),
 
-            // Material Breakdown
-            _buildMaterialBreakdown(stats),
-
-            const SizedBox(height: 24),
-
-            // Goals & Progress
+            // Goals & Progress (Activity Insights - Personal)
             _buildGoalsProgress(stats),
 
             const SizedBox(height: 24),
 
             // Environmental Equivalencies
             _buildEnvironmentalEquivalents(stats),
+
+            const SizedBox(height: 24),
+
+            // Material Breakdown (moved to bottom as detailed breakdown)
+            _buildMaterialBreakdown(stats),
 
             const SizedBox(height: 24),
 
@@ -395,7 +395,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
                     height: 50,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: AppColors.secondary.withOpacity(0.1),
+                      color: AppColors.secondary.withValues(alpha: 0.1),
                       borderRadius: AppBorderRadius.mediumBorder,
                     ),
                     child: Text(
@@ -465,7 +465,7 @@ class _AnalyticsDashboardScreenState extends State<AnalyticsDashboardScreen> {
         const SizedBox(height: 8),
         LinearProgressIndicator(
           value: progress,
-          backgroundColor: color.withOpacity(0.2),
+          backgroundColor: color.withValues(alpha: 0.2),
           valueColor: AlwaysStoppedAnimation<Color>(color),
         ),
         const SizedBox(height: 4),
@@ -542,9 +542,9 @@ class _ImpactMetricCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: AppBorderRadius.mediumBorder,
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [

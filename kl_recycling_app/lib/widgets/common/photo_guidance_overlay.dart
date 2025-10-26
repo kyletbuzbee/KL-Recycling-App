@@ -71,14 +71,14 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
 
   Widget _buildOverlayContent() {
     return Container(
-      color: Colors.black.withOpacity(0.7),
+      color: Colors.black.withValues(alpha: 0.7),
       child: SafeArea(
         child: Column(
           children: [
             // Header with close button
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              color: AppColors.primary.withOpacity(0.9),
+              color: AppColors.primary.withValues(alpha: 0.9),
               child: Row(
                 children: [
                   const Icon(Icons.photo_camera, color: Colors.white, size: 28),
@@ -102,7 +102,7 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
               ),
             ),
 
-            // Main tips area
+            // Main tips area - Simplified to essential tips only
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(20),
@@ -110,124 +110,48 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildTipSection(
-                      'Essential Tips',
+                      'Essential Tips for Best Results',
                       Icons.star,
                       [
                         'Position metal centrally in frame',
                         'Ensure good lighting from multiple angles',
-                        'Include a reference object for scale (coin, quarter, or ruler)',
-                        'Avoid shadows and reflections',
-                        'Keep camera steady and in focus',
+                        'Include a reference object (coin, quarter, or ruler)',
                       ],
                     ),
 
                     const SizedBox(height: 24),
 
-                    _buildTipSection(
-                      'Reference Objects',
-                      Icons.aspect_ratio,
-                      [
-                        'US Quarter: 1 inch diameter',
-                        'AA Battery: 1.5 inches long',
-                        'Ruler: Provides precise measurements',
-                        'Playing card: 2.5 x 3.5 inches',
-                        'Credit card: 3.375 x 2.125 inches',
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    // Toggle for advanced tips
+                    // Help icon for additional details
                     Card(
-                      color: AppColors.surfaceDark.withOpacity(0.9),
+                      color: AppColors.surfaceDark.withValues(alpha: 0.9),
                       margin: EdgeInsets.zero,
                       child: InkWell(
-                        onTap: () => setState(() => _showAdvancedTips = !_showAdvancedTips),
+                        onTap: () => _showDetailedHelp(),
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Row(
                             children: [
                               Icon(
-                                _showAdvancedTips ? Icons.expand_less : Icons.expand_more,
+                                Icons.help_outline,
                                 color: AppColors.secondary,
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                'Advanced Photo Techniques',
+                                'Need more detailed tips?',
                                 style: TextStyle(
                                   color: AppColors.onSurfaceDark,
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
+                              const Spacer(),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                color: AppColors.secondary,
+                                size: 16,
+                              ),
                             ],
                           ),
-                        ),
-                      ),
-                    ),
-
-                    if (_showAdvancedTips) ...[
-                      const SizedBox(height: 16),
-                      _buildTipSection(
-                        'Advanced Techniques',
-                        Icons.exposure_plus_1,
-                        [
-                          'Use parallel lighting to reduce glare',
-                          'Photograph from 45-degree angle for depth perception',
-                          'Capture multiple angles when possible (top, side, bottom)',
-                          'Ensure metal surface texture is visible',
-                          'Avoid busy backgrounds that might confuse AI detection',
-                          'Use grid overlay feature for composition',
-                          'Take photos with consistent zoom level',
-                        ],
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      _buildTipSection(
-                        'Material-Specific Tips',
-                        Icons.category,
-                        [
-                          'Steel/Iron: Show edges and thickness clearly',
-                          'Aluminum: Capture lightweight appearance and shine',
-                          'Copper: Highlight reddish tint and conductivity',
-                          'Brass: Show golden color and smoothness',
-                          'Wire/Thin materials: Photograph against contrasting background',
-                        ],
-                      ),
-                    ],
-
-                    const SizedBox(height: 24),
-
-                    // Confidence indicators
-                    Card(
-                      color: AppColors.surfaceDark.withOpacity(0.9),
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                Icon(Icons.insights, color: AppColors.info),
-                                const SizedBox(width: 12),
-                                Text(
-                                  'AI Analysis Quality',
-                                  style: TextStyle(
-                                    color: AppColors.onSurfaceDark,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 12),
-                            _buildConfidenceBar('High Confidence', 0.85, AppColors.success),
-                            const SizedBox(height: 8),
-                            _buildConfidenceBar('Medium Confidence', 0.65, AppColors.warning),
-                            const SizedBox(height: 8),
-                            _buildConfidenceBar('Low Confidence', 0.35, AppColors.error),
-                          ],
                         ),
                       ),
                     ),
@@ -248,12 +172,14 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
                           ),
                         ),
                         const SizedBox(width: 12),
-                        ElevatedButton.icon(
-                          onPressed: widget.onDismiss,
-                          icon: const Icon(Icons.camera_alt),
-                          label: const Text('Take Photo'),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primary,
+                        Expanded(
+                          child: ElevatedButton.icon(
+                            onPressed: widget.onDismiss,
+                            icon: const Icon(Icons.camera_alt),
+                            label: const Text('Take Photo'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                            ),
                           ),
                         ),
                       ],
@@ -270,7 +196,7 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
 
   Widget _buildTipSection(String title, IconData icon, List<String> tips) {
     return Card(
-      color: AppColors.surfaceDark.withOpacity(0.9),
+      color: AppColors.surfaceDark.withValues(alpha: 0.9),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -309,7 +235,7 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
                     child: Text(
                       tip,
                       style: TextStyle(
-                        color: AppColors.onSurfaceDark.withOpacity(0.9),
+                        color: AppColors.onSurfaceDark.withValues(alpha: 0.9),
                         fontSize: 14,
                         height: 1.4,
                       ),
@@ -332,7 +258,7 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
           child: Text(
             label,
             style: TextStyle(
-              color: AppColors.onSurfaceDark.withOpacity(0.8),
+              color: AppColors.onSurfaceDark.withValues(alpha: 0.8),
               fontSize: 14,
             ),
           ),
@@ -395,6 +321,144 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
     );
   }
 
+  void _showDetailedHelp() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.surfaceDark,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.8,
+        maxChildSize: 0.9,
+        builder: (context, scrollController) => Container(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.help, color: AppColors.secondary, size: 32),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Detailed Photo Tips',
+                    style: TextStyle(
+                      color: AppColors.onSurfaceDark,
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: SingleChildScrollView(
+                  controller: scrollController,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildTipSection(
+                        'Reference Objects',
+                        Icons.aspect_ratio,
+                        [
+                          'US Quarter: 1 inch diameter',
+                          'AA Battery: 1.5 inches long',
+                          'Ruler: Provides precise measurements',
+                          'Playing card: 2.5 x 3.5 inches',
+                          'Credit card: 3.375 x 2.125 inches',
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      _buildTipSection(
+                        'Advanced Techniques',
+                        Icons.exposure_plus_1,
+                        [
+                          'Use parallel lighting to reduce glare',
+                          'Photograph from 45-degree angle for depth perception',
+                          'Capture multiple angles when possible (top, side, bottom)',
+                          'Ensure metal surface texture is visible',
+                          'Avoid busy backgrounds that might confuse AI detection',
+                          'Use grid overlay feature for composition',
+                          'Take photos with consistent zoom level',
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      _buildTipSection(
+                        'Material-Specific Tips',
+                        Icons.category,
+                        [
+                          'Steel/Iron: Show edges and thickness clearly',
+                          'Aluminum: Capture lightweight appearance and shine',
+                          'Copper: Highlight reddish tint and conductivity',
+                          'Brass: Show golden color and smoothness',
+                          'Wire/Thin materials: Photograph against contrasting background',
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      // AI Analysis Quality section
+                      Card(
+                        color: AppColors.surfaceDark.withValues(alpha: 0.9),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(Icons.insights, color: AppColors.info),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'AI Analysis Quality',
+                                    style: TextStyle(
+                                      color: AppColors.onSurfaceDark,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              _buildConfidenceBar('High Confidence', 0.85, AppColors.success),
+                              const SizedBox(height: 8),
+                              _buildConfidenceBar('Medium Confidence', 0.65, AppColors.warning),
+                              const SizedBox(height: 8),
+                              _buildConfidenceBar('Low Confidence', 0.35, AppColors.error),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  const Spacer(),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      'Close',
+                      style: TextStyle(
+                        color: AppColors.secondary,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildReferenceObjectButton(String name, String size, IconData icon) {
     return InkWell(
       onTap: () {
@@ -410,8 +474,8 @@ class _PhotoGuidanceOverlayState extends State<PhotoGuidanceOverlay>
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.1),
-          border: Border.all(color: AppColors.primary.withOpacity(0.3)),
+          color: AppColors.primary.withValues(alpha: 0.1),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(

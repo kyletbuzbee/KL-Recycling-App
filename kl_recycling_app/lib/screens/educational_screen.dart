@@ -36,7 +36,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
           controller: _tabController,
           indicatorColor: Colors.white,
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.7),
+          unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
           tabs: const [
             Tab(
               text: 'Metal Facts',
@@ -140,7 +140,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
       CustomCard(
         margin: const EdgeInsets.only(bottom: 12),
         variant: CardVariant.filled,
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
@@ -150,13 +150,13 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                    colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: AppBorderRadius.mediumBorder,
                   border: Border.all(
-                    color: color.withOpacity(0.3),
+                    color: color.withValues(alpha: 0.3),
                     width: 1,
                   ),
                 ),
@@ -270,7 +270,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
         child: CustomCard(
           margin: const EdgeInsets.only(bottom: 12),
           variant: CardVariant.filled,
-          color: color.withOpacity(0.05),
+          color: color.withValues(alpha: 0.05),
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -280,13 +280,13 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
-                      colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                      colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     borderRadius: AppBorderRadius.mediumBorder,
                     border: Border.all(
-                      color: color.withOpacity(0.3),
+                      color: color.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -367,7 +367,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
                 width: 32,
                 margin: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  color: AppColors.onSurface.withOpacity(0.3),
+                  color: AppColors.onSurface.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -375,7 +375,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [color.withOpacity(0.1), color.withOpacity(0.05)],
+                    colors: [color.withValues(alpha: 0.1), color.withValues(alpha: 0.05)],
                     begin: Alignment.topCenter,
                     end: Alignment.bottomCenter,
                   ),
@@ -386,7 +386,7 @@ class _EducationalScreenState extends State<EducationalScreen> with TickerProvid
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
                         gradient: LinearGradient(
-                          colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                          colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
                         ),
                         borderRadius: AppBorderRadius.mediumBorder,
                       ),

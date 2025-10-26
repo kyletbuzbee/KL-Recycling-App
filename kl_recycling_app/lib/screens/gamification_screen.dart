@@ -59,7 +59,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
           controller: _tabController,
           indicatorColor: Colors.white,
           labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.7),
+          unselectedLabelColor: Colors.white.withValues(alpha: 0.7),
           tabs: const [
             Tab(
               text: 'Dashboard',
@@ -102,7 +102,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                 Icon(
                   Icons.recycling,
                   size: 120,
-                  color: AppColors.primary.withOpacity(0.5),
+                  color: AppColors.primary.withValues(alpha: 0.5),
                 ),
               ),
               const SizedBox(height: 24),
@@ -311,7 +311,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                     Icon(
                       Icons.history,
                       size: 80,
-                      color: AppColors.onSurfaceSecondary.withOpacity(0.5),
+                      color: AppColors.onSurfaceSecondary.withValues(alpha: 0.5),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -344,8 +344,8 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    AppColors.success.withOpacity(0.2),
-                                    AppColors.success.withOpacity(0.1)
+                                    AppColors.success.withValues(alpha: 0.2),
+                                    AppColors.success.withValues(alpha: 0.1)
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -391,7 +391,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
-                                color: AppColors.success.withOpacity(0.1),
+                                color: AppColors.success.withValues(alpha: 0.1),
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Text(
@@ -505,7 +505,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                               Icon(
                                 Icons.analytics_outlined,
                                 size: 64,
-                                color: AppColors.onSurfaceSecondary.withOpacity(0.5),
+                                color: AppColors.onSurfaceSecondary.withValues(alpha: 0.5),
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -608,7 +608,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
                               Icon(
                                 Icons.insights,
                                 size: 48,
-                                color: AppColors.onSurfaceSecondary.withOpacity(0.5),
+                                color: AppColors.onSurfaceSecondary.withValues(alpha: 0.5),
                               ),
                               const SizedBox(height: 16),
                               Text(
@@ -664,7 +664,7 @@ class _GamificationScreenState extends State<GamificationScreen> with TickerProv
 
               // Educational note
               CustomCard(
-                color: AppColors.info.withOpacity(0.1),
+                color: AppColors.info.withValues(alpha: 0.1),
                 child: Padding(
                   padding: const EdgeInsets.all(16),
                   child: Row(
@@ -757,7 +757,7 @@ class _StatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return CustomCard(
-      color: color.withOpacity(0.1),
+      color: color.withValues(alpha: 0.1),
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -766,7 +766,7 @@ class _StatCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: color.withOpacity(0.2),
+                color: color.withValues(alpha: 0.2),
                 borderRadius: AppBorderRadius.mediumBorder,
               ),
               child: Icon(
@@ -815,8 +815,8 @@ class _BadgeCard extends StatelessWidget {
     return AnimatedCard(
       child: CustomCard(
         color: isEarned
-            ? badgeType.color.withOpacity(0.1)
-            : AppColors.surface.withOpacity(0.5),
+            ? badgeType.color.withValues(alpha: 0.1)
+            : AppColors.surface.withValues(alpha: 0.5),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -834,7 +834,7 @@ class _BadgeCard extends StatelessWidget {
                     Icon(
                       Icons.lock,
                       size: 20,
-                      color: AppColors.onSurfaceSecondary.withOpacity(0.7),
+                      color: AppColors.onSurfaceSecondary.withValues(alpha: 0.7),
                     ),
                 ],
               ),
@@ -902,9 +902,9 @@ class _AnalyticsMetricCard extends StatelessWidget {
     final card = Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: AppBorderRadius.mediumBorder,
-        border: Border.all(color: color.withOpacity(0.3)),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
@@ -913,7 +913,7 @@ class _AnalyticsMetricCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: color.withOpacity(0.2),
+                  color: color.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(

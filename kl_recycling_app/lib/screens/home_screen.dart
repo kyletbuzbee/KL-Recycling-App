@@ -16,9 +16,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _heroFadeAnimation;
   late Animation<Offset> _heroSlideAnimation;
 
+  final ScrollController _scrollController = ScrollController();
+  late AnimationController _appBarAnimationController;
+  late Animation<double> _appBarOpacityAnimation;
+
   @override
   void initState() {
     super.initState();
+
+    // Initialize hero animations
     _heroAnimationController = AnimationController(
       duration: const Duration(milliseconds: 1200),
       vsync: this,
@@ -41,81 +47,151 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     ));
 
     _heroAnimationController.forward();
+
+    // Initialize scroll-aware app bar
+    _appBarAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+
+    _appBarOpacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _appBarAnimationController,
+      curve: Curves.easeInOut,
+    ));
+
+    // Listen to scroll changes
+    _scrollController.addListener(_onScrollChanged);
   }
 
   @override
   void dispose() {
     _heroAnimationController.dispose();
+    _appBarAnimationController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScrollChanged() {
+    final offset = _scrollController.offset;
+    const threshold = 50.0; // Show app bar when scrolled 50px
+
+    if (offset > threshold && !_appBarAnimationController.isCompleted) {
+      _appBarAnimationController.forward();
+    } else if (offset <= threshold && !_appBarAnimationController.isDismissed) {
+      _appBarAnimationController.reverse();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        title: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 4,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(7),
-                child: Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.all(2),
-                  child: Image.asset(
-                    AppConstants.logoPath,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        color: Colors.white,
-                        child: const Icon(
-                          Icons.business,
-                          color: AppColors.primary,
-                          size: 32,
+      extendBodyBehindAppBar: true,
+      backgroundColor: AppColors.background,
+      body: AppAnimations.fadeIn(
+        CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            // Transparent Scrolling AppBar
+            SliverAppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              floating: true,
+              pinned: true,
+              snap: false,
+              stretchTriggerOffset: 200,
+              onStretchTrigger: () {
+                // Could add refresh logic here
+                return Future<void>.value();
+              },
+              expandedHeight: MediaQuery.of(context).size.height * 0.08,
+              flexibleSpace: AnimatedBuilder(
+                animation: _appBarOpacityAnimation,
+                builder: (context, child) => Container(
+                  color: AppColors.primary.withValues(alpha: _appBarOpacityAnimation.value),
+                  child: child,
+                ),
+                child: FlexibleSpaceBar(
+                  background: Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: _appBarOpacityAnimation.value * 0.95),
+                      // Optional glassmorphism effect when scrolled
+                      boxShadow: _appBarOpacityAnimation.value > 0.1 ? [
+                        BoxShadow(
+                          color: AppColors.primary.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
-                      );
-                    },
+                      ] : [],
+                    ),
+                    padding: EdgeInsets.only(
+                      top: MediaQuery.of(context).padding.top + 8,
+                      left: 16,
+                      right: 16,
+                      bottom: 8,
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10),
+                            border: Border.all(color: Colors.white, width: 2),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.2),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(7),
+                            child: Container(
+                              color: Colors.white,
+                              padding: const EdgeInsets.all(2),
+                              child: Image.asset(
+                                AppConstants.logoPath,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    color: Colors.white,
+                                    child: const Icon(
+                                      Icons.business,
+                                      color: AppColors.primary,
+                                      size: 32,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'K&L Recycling',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.phone, color: Colors.white),
+                          onPressed: () => _callBusiness(context),
+                          tooltip: 'Call Us',
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 12),
-            const Text(
-              'K&L Recycling',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.phone, color: Colors.white),
-            onPressed: () => _callBusiness(context),
-            tooltip: 'Call Us',
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-      backgroundColor: AppColors.background,
-      body: AppAnimations.fadeIn(
-        CustomScrollView(
-          slivers: [
             // Enhanced Hero Section with Image Background and Animation
             SliverToBoxAdapter(
               child: Stack(
@@ -143,8 +219,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  AppColors.primary.withOpacity(0.3),
-                                  AppColors.primary.withOpacity(0.1),
+                                  AppColors.primary.withValues(alpha: 0.3),
+                                  AppColors.primary.withValues(alpha: 0.1),
                                 ],
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
@@ -158,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: Icon(
                               Icons.recycling,
                               size: 120,
-                              color: Colors.white.withOpacity(0.1),
+                              color: Colors.white.withValues(alpha: 0.1),
                             ),
                           ),
                         ],
@@ -194,7 +270,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   shadows: [
                                     Shadow(
                                       blurRadius: 4,
-                                      color: Colors.black.withOpacity(0.3),
+                                      color: Colors.black.withValues(alpha: 0.3),
                                       offset: const Offset(1, 1),
                                     ),
                                   ],
@@ -207,12 +283,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               Text(
                                 'Leading provider of mobile car crushing, oil & gas demolition, roll-off containers, and public recycling drop-off locations in Texas',
                                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                  color: Colors.white.withOpacity(0.95),
+                                  color: Colors.white.withValues(alpha: 0.95),
                                   height: 1.6,
                                   shadows: [
                                     Shadow(
                                       blurRadius: 3,
-                                      color: Colors.black.withOpacity(0.2),
+                                      color: Colors.black.withValues(alpha: 0.2),
                                       offset: const Offset(0, 1),
                                     ),
                                   ],
@@ -257,7 +333,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   Expanded(
                                     child: Container(
                                       decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.white.withOpacity(0.4), width: 2),
+                                        border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
                                         borderRadius: AppBorderRadius.mediumBorder,
                                       ),
                                       child: OutlinedButton(
@@ -317,11 +393,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Expanded(
                             child: AppAnimations.rotateIn(
                               _AnimatedQuickActionCard(
-                                icon: Icons.camera_alt,
-                                label: 'Photo Estimate',
-                                backgroundColor: AppColors.info.withOpacity(0.1),
-                                iconColor: AppColors.info,
-                                onTap: () => _navigateToCamera(context),
+                                icon: Icons.loyalty,
+                                label: 'My Loyalty',
+                                backgroundColor: AppColors.warning.withValues(alpha: 0.1),
+                                iconColor: AppColors.warning,
+                                onTap: () => _navigateToLoyalty(context),
                               ),
                               delay: const Duration(milliseconds: 1000),
                             ),
@@ -332,7 +408,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               _AnimatedQuickActionCard(
                                 icon: Icons.local_shipping,
                                 label: 'Container Quote',
-                                backgroundColor: AppColors.success.withOpacity(0.1),
+                                backgroundColor: AppColors.success.withValues(alpha: 0.1),
                                 iconColor: AppColors.success,
                                 onTap: () => _navigateToContainerQuote(context),
                               ),
@@ -349,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               _AnimatedQuickActionCard(
                                 icon: Icons.phone,
                                 label: 'Call Us',
-                                backgroundColor: AppColors.primaryLight.withOpacity(0.1),
+                                backgroundColor: AppColors.primaryLight.withValues(alpha: 0.1),
                                 iconColor: AppColors.primary,
                                 onTap: () => _callBusiness(context),
                               ),
@@ -362,7 +438,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               _AnimatedQuickActionCard(
                                 icon: Icons.location_on,
                                 label: 'Locations',
-                                backgroundColor: AppColors.info.withOpacity(0.1),
+                                backgroundColor: AppColors.info.withValues(alpha: 0.1),
                                 iconColor: AppColors.info,
                                 onTap: () => ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('Locations screen coming soon')),
@@ -451,10 +527,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   child: Container(
                     padding: const EdgeInsets.all(32),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.05),
+                      color: AppColors.primary.withValues(alpha: 0.05),
                       borderRadius: AppBorderRadius.extraLargeBorder,
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.1),
+                        color: AppColors.primary.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     ),
@@ -630,6 +706,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       const SnackBar(content: Text('Contact screen coming soon')),
     );
   }
+
+  void _navigateToLoyalty(BuildContext context) {
+    // Navigate to loyalty dashboard screen
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Loyalty screen coming soon')),
+    );
+  }
 }
 
 class _QuickActionButton extends StatelessWidget {
@@ -653,7 +736,7 @@ class _QuickActionButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
-          side: BorderSide(color: AppColors.primary.withOpacity(0.3)),
+          side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -697,7 +780,7 @@ class _FeatureCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(
@@ -735,7 +818,7 @@ class _FeatureCard extends StatelessWidget {
   }
 }
 
-class _AnimatedQuickActionCard extends StatelessWidget {
+class _AnimatedQuickActionCard extends StatefulWidget {
   final IconData icon;
   final String label;
   final Color backgroundColor;
@@ -751,46 +834,96 @@ class _AnimatedQuickActionCard extends StatelessWidget {
   });
 
   @override
+  State<_AnimatedQuickActionCard> createState() => _AnimatedQuickActionCardState();
+}
+
+class _AnimatedQuickActionCardState extends State<_AnimatedQuickActionCard>
+    with TickerProviderStateMixin {
+  late AnimationController _scaleController;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _scaleController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _scaleController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _scaleController.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    _scaleController.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    _scaleController.reverse();
+  }
+
+  void _onTapCancel() {
+    _scaleController.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return AnimatedCard(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        decoration: BoxDecoration(
-          color: backgroundColor,
-          borderRadius: AppBorderRadius.largeBorder,
-          border: Border.all(
-            color: iconColor.withOpacity(0.2),
-            width: 1,
-          ),
+    return GestureDetector(
+      onTapDown: _onTapDown,
+      onTapUp: _onTapUp,
+      onTapCancel: _onTapCancel,
+      onTap: widget.onTap,
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.1),
-                borderRadius: AppBorderRadius.mediumBorder,
-                boxShadow: [AppShadows.small],
-              ),
-              child: Icon(
-                icon,
-                size: 32,
-                color: iconColor,
-              ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          decoration: BoxDecoration(
+            color: widget.backgroundColor,
+            borderRadius: AppBorderRadius.largeBorder,
+            border: Border.all(
+              color: widget.iconColor.withValues(alpha: 0.2),
+              width: 1,
             ),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: TextStyle(
-                color: AppColors.onSurface,
-                fontWeight: FontWeight.w700,
-                fontSize: 14,
+            boxShadow: [AppShadows.small],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: widget.iconColor.withValues(alpha: 0.1),
+                  borderRadius: AppBorderRadius.mediumBorder,
+                  boxShadow: [AppShadows.small],
+                ),
+                child: Icon(
+                  widget.icon,
+                  size: 32,
+                  color: widget.iconColor,
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ],
+              const SizedBox(height: 12),
+              Text(
+                widget.label,
+                style: TextStyle(
+                  color: AppColors.onSurface,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 14,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -819,21 +952,21 @@ class _EnhancedFeatureCard extends StatelessWidget {
         animationDelay: animationDelay,
         variant: CardVariant.filled,
         margin: const EdgeInsets.only(bottom: 12),
-        color: color.withOpacity(0.05),
+        color: color.withValues(alpha: 0.05),
         child: Row(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [color.withOpacity(0.2), color.withOpacity(0.1)],
+                  colors: [color.withValues(alpha: 0.2), color.withValues(alpha: 0.1)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
                 borderRadius: AppBorderRadius.mediumBorder,
                 boxShadow: [AppShadows.small],
                 border: Border.all(
-                  color: color.withOpacity(0.3),
+                  color: color.withValues(alpha: 0.3),
                   width: 1,
                 ),
               ),
@@ -869,7 +1002,7 @@ class _EnhancedFeatureCard extends StatelessWidget {
             Icon(
               Icons.arrow_forward_ios,
               size: 16,
-              color: color.withOpacity(0.6),
+              color: color.withValues(alpha: 0.6),
             ),
           ],
         ),

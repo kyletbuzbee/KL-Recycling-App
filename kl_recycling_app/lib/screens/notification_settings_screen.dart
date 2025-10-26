@@ -351,7 +351,7 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
 
             // Info card
             CustomCard(
-              color: AppColors.info.withOpacity(0.1),
+              color: AppColors.info.withValues(alpha: 0.1),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(

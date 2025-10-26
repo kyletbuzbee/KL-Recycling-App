@@ -151,19 +151,17 @@ class AppBorderRadius {
 class AppTheme {
   static ThemeData get lightTheme {
     return ThemeData(
-      primaryColor: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.surface,
+      // Enable Material 3
+      useMaterial3: true,
 
-      colorScheme: const ColorScheme(
+      // Use Material 3 ColorScheme.fromSeed for full color palette generation
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.light,
+        // Optional: customize specific colors if needed
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.surface,
-        error: AppColors.error,
-        onPrimary: AppColors.onPrimary,
-        onSecondary: AppColors.onSecondary,
-        onSurface: AppColors.onSurface,
-        onError: Colors.white,
-        brightness: Brightness.light,
       ),
 
       textTheme: TextTheme(
@@ -221,7 +219,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.largeBorder),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shadowColor: AppColors.primary.withOpacity(0.1),
+        shadowColor: AppColors.primary.withValues(alpha: 0.1),
         color: AppColors.surface,
       ),
 
@@ -238,7 +236,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.mediumBorder,
-          borderSide: BorderSide(color: AppColors.primaryLight.withOpacity(0.5)),
+          borderSide: BorderSide(color: AppColors.primaryLight.withValues(alpha: 0.5)),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         hintStyle: TextStyle(
@@ -267,19 +265,17 @@ class AppTheme {
 
   static ThemeData get darkTheme {
     return ThemeData(
-      primaryColor: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.surfaceDark,
+      // Enable Material 3
+      useMaterial3: true,
 
-      colorScheme: const ColorScheme(
+      // Use Material 3 ColorScheme.fromSeed for full color palette generation
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.dark,
+        // Optional: customize specific colors if needed
         primary: AppColors.primary,
         secondary: AppColors.secondary,
         surface: AppColors.surfaceDark,
-        error: AppColors.error,
-        onPrimary: AppColors.onPrimaryDark,
-        onSecondary: AppColors.onSecondaryDark,
-        onSurface: AppColors.onSurfaceDark,
-        onError: Colors.white,
-        brightness: Brightness.dark,
       ),
 
       textTheme: TextTheme(
@@ -337,7 +333,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.largeBorder),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shadowColor: AppColors.primary.withOpacity(0.1),
+        shadowColor: AppColors.primary.withValues(alpha: 0.1),
         color: AppColors.surfaceDark,
       ),
 
@@ -354,7 +350,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.mediumBorder,
-          borderSide: BorderSide(color: AppColors.primaryLight.withOpacity(0.5)),
+          borderSide: BorderSide(color: AppColors.primaryLight.withValues(alpha: 0.5)),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         hintStyle: TextStyle(

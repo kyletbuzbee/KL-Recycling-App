@@ -246,15 +246,15 @@ class ServiceCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Theme.of(context).primaryColor.withOpacity(0.2),
-                      Theme.of(context).primaryColor.withOpacity(0.1),
+                      Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                      Theme.of(context).primaryColor.withValues(alpha: 0.1),
                     ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: AppBorderRadius.mediumBorder,
                   border: Border.all(
-                    color: Theme.of(context).primaryColor.withOpacity(0.2),
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
                     width: 1,
                   ),
                 ),
@@ -265,10 +265,10 @@ class ServiceCard extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.surface.withOpacity(0.9),
+                          color: AppColors.surface.withValues(alpha: 0.9),
                           borderRadius: AppBorderRadius.largeBorder,
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                             width: 2,
                           ),
                         ),
@@ -383,10 +383,10 @@ class ServiceCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
                       borderRadius: AppBorderRadius.smallBorder,
                       border: Border.all(
-                        color: Theme.of(context).primaryColor.withOpacity(0.3),
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
                         width: 1,
                       ),
                     ),

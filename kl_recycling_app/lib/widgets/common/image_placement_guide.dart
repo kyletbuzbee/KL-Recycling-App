@@ -145,10 +145,10 @@ class ImagePlacementGuide extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: AppColors.primary.withOpacity(0.05),
+              color: AppColors.primary.withValues(alpha: 0.05),
               borderRadius: AppBorderRadius.largeBorder,
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 width: 2,
               ),
             ),
@@ -187,10 +187,10 @@ class ImagePlacementGuide extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: AppColors.success.withOpacity(0.1),
+                    color: AppColors.success.withValues(alpha: 0.1),
                     borderRadius: AppBorderRadius.mediumBorder,
                     border: Border.all(
-                      color: AppColors.success.withOpacity(0.3),
+                      color: AppColors.success.withValues(alpha: 0.3),
                       width: 1,
                     ),
                   ),
@@ -229,7 +229,7 @@ class ImagePlacementGuide extends StatelessWidget {
         borderRadius: AppBorderRadius.mediumBorder,
         boxShadow: [AppShadows.small],
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.1),
+          color: AppColors.primary.withValues(alpha: 0.1),
           width: 1,
         ),
       ),
@@ -241,9 +241,9 @@ class ImagePlacementGuide extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: priority <= 2 ? AppColors.success.withOpacity(0.2) :
-                        priority <= 4 ? AppColors.warning.withOpacity(0.2) :
-                        AppColors.info.withOpacity(0.2),
+                  color: priority <= 2 ? AppColors.success.withValues(alpha: 0.2) :
+                        priority <= 4 ? AppColors.warning.withValues(alpha: 0.2) :
+                        AppColors.info.withValues(alpha: 0.2),
                   borderRadius: AppBorderRadius.smallBorder,
                 ),
                 child: Text(
@@ -293,7 +293,7 @@ class ImagePlacementGuide extends StatelessWidget {
               color: AppColors.surface,
               borderRadius: AppBorderRadius.smallBorder,
               border: Border.all(
-                color: AppColors.primary.withOpacity(0.2),
+                color: AppColors.primary.withValues(alpha: 0.2),
                 width: 1,
               ),
             ),

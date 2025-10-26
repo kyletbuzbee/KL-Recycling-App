@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:kl_recycling_app/providers/loyalty_provider.dart';
 import 'package:kl_recycling_app/models/loyalty.dart';
+
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
+import 'package:kl_recycling_app/widgets/common/animated_counter.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 
 class LoyaltyDashboardScreen extends StatefulWidget {
@@ -199,8 +201,8 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
   Widget _buildPointsColumn(String label, int points, Color color) {
     return Column(
       children: [
-        Text(
-          points.toString(),
+        AnimatedCounter(
+          value: points,
           style: TextStyle(
             fontSize: 28,
             fontWeight: FontWeight.bold,

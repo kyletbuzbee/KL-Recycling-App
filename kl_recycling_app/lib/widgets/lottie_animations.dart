@@ -15,7 +15,7 @@ class LottieAnimations {
     late final OverlayEntry overlayEntry;
     overlayEntry = OverlayEntry(
       builder: (context) => Material(
-        color: Colors.black.withOpacity(0.3),
+        color: Colors.black.withValues(alpha: 0.3),
         child: Center(
           child: Container(
             padding: const EdgeInsets.all(32),
@@ -177,7 +177,7 @@ class LottieAnimations {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [color.withOpacity(0.9), color],
+                    colors: [color.withValues(alpha: 0.9), color],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
@@ -189,7 +189,7 @@ class LottieAnimations {
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: AppBorderRadius.mediumBorder,
                       ),
                       child: Icon(
@@ -216,7 +216,7 @@ class LottieAnimations {
                           Text(
                             description,
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.9),
+                              color: Colors.white.withValues(alpha: 0.9),
                               fontSize: 14,
                             ),
                           ),
@@ -303,7 +303,7 @@ class LottieAnimations {
           Text(
             unit,
             style: TextStyle(
-              color: Colors.white.withOpacity(0.8),
+              color: Colors.white.withValues(alpha: 0.8),
               fontSize: 10,
             ),
             textAlign: TextAlign.center,
@@ -352,7 +352,7 @@ class _BadgeCelebrationWidgetState extends State<_BadgeCelebrationWidget> {
       opacity: showAnimation ? 1.0 : 0.0,
       duration: const Duration(milliseconds: 500),
       child: Container(
-        color: Colors.black.withOpacity(0.7),
+        color: Colors.black.withValues(alpha: 0.7),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -365,7 +365,7 @@ class _BadgeCelebrationWidgetState extends State<_BadgeCelebrationWidget> {
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: widget.badgeColor.withOpacity(0.1),
+                  color: widget.badgeColor.withValues(alpha: 0.1),
                   borderRadius: AppBorderRadius.extraLargeBorder,
                   border: Border.all(
                     color: widget.badgeColor,
@@ -373,7 +373,7 @@ class _BadgeCelebrationWidgetState extends State<_BadgeCelebrationWidget> {
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: widget.badgeColor.withOpacity(0.3),
+                      color: widget.badgeColor.withValues(alpha: 0.3),
                       blurRadius: 20,
                       spreadRadius: 5,
                     ),
@@ -473,7 +473,7 @@ class _CelebrationWrapperState extends State<_CelebrationWrapper> {
         widget.child,
         if (showCelebration)
           Container(
-            color: Colors.black.withOpacity(0.3),
+            color: Colors.black.withValues(alpha: 0.3),
             child: Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

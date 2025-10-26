@@ -68,7 +68,7 @@ class CustomCard extends StatelessWidget {
             borderRadius: effectiveBorderRadius,
           ),
           color: color ?? AppColors.surface,
-          shadowColor: AppColors.primary.withOpacity(0.15),
+          shadowColor: AppColors.primary.withValues(alpha: 0.15),
           child: Container(
             decoration: BoxDecoration(
               borderRadius: effectiveBorderRadius,
@@ -89,7 +89,7 @@ class CustomCard extends StatelessWidget {
             borderRadius: effectiveBorderRadius,
             boxShadow: AppShadows.cardShadows,
             border: Border.all(
-              color: AppColors.primary.withOpacity(0.1),
+              color: AppColors.primary.withValues(alpha: 0.1),
               width: 1,
             ),
           ),
@@ -106,7 +106,7 @@ class CustomCard extends StatelessWidget {
             color: color ?? AppColors.surface,
             borderRadius: effectiveBorderRadius,
             border: Border.all(
-              color: AppColors.primaryLight.withOpacity(0.3),
+              color: AppColors.primaryLight.withValues(alpha: 0.3),
               width: 1.5,
             ),
           ),

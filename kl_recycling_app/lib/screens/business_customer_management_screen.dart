@@ -5,6 +5,7 @@ import '../providers/business_customer_provider.dart';
 import '../models/business_customer.dart';
 import '../widgets/common/custom_card.dart';
 import '../config/theme.dart';
+import 'forms/add_customer_form_screen.dart';
 
 class BusinessCustomerManagementScreen extends StatefulWidget {
   const BusinessCustomerManagementScreen({super.key});
@@ -395,9 +396,9 @@ class _BusinessCustomerManagementScreenState
           width: 48,
           height: 48,
           decoration: BoxDecoration(
-            color: customer.tierColor.withOpacity(0.1),
+            color: customer.tierColor.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: customer.tierColor.withOpacity(0.3)),
+            border: Border.all(color: customer.tierColor.withValues(alpha: 0.3)),
           ),
           child: Icon(
             Icons.business,
@@ -555,7 +556,12 @@ class _BusinessCustomerManagementScreenState
   }
 
   void _showAddCustomerDialog() {
-    _showCustomerDialog(null, 'Add New Customer');
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const AddCustomerFormScreen(),
+      ),
+    );
   }
 
   void _showEditCustomerDialog(BusinessCustomer customer) {
@@ -1062,7 +1068,7 @@ class CustomerDetailScreen extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: customer.statusColor.withOpacity(0.1),
+                    color: customer.statusColor.withValues(alpha: 0.1),
                     border: Border.all(color: customer.statusColor),
                     borderRadius: BorderRadius.circular(20),
                   ),

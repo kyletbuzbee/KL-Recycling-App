@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kl_recycling_app/config/theme.dart';
 import 'package:kl_recycling_app/config/constants.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
+import 'package:kl_recycling_app/screens/contact_screen.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LocationsScreen extends StatelessWidget {
   const LocationsScreen({super.key});
@@ -171,7 +173,8 @@ class LocationsScreen extends StatelessWidget {
               'We provide scrap metal recycling and container services within a ${AppConstants.serviceRadiusMiles}-mile radius of our main yard',
               style: TextStyle(
                 fontSize: 16,
-                color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                color: Theme.of(context).textTheme.bodyLarge?.color,
+                height: 1.5,
               ),
             ),
             const SizedBox(height: 16),
@@ -223,11 +226,11 @@ class LocationsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Transportation & Logistics',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.onSurface,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -282,7 +285,7 @@ class LocationsScreen extends StatelessWidget {
                     'Contact us for special arrangements or to discuss services beyond our regular service radius.',
                     style: TextStyle(
                       fontSize: 16,
-                      color: Theme.of(context).textTheme.bodyMedium?.color?.withValues(alpha: 0.7),
+                      color: Theme.of(context).textTheme.bodyLarge?.color,
                       height: 1.5,
                     ),
                   ),
@@ -310,15 +313,27 @@ class LocationsScreen extends StatelessWidget {
     );
   }
 
-  void _callLocation(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Call ${AppConstants.phoneNumber}')),
-    );
+  Future<void> _callLocation(BuildContext context) async {
+    final phoneUrl = Uri.parse('tel:${AppConstants.phoneNumber}');
+    try {
+      if (await canLaunchUrl(phoneUrl)) {
+        await launchUrl(phoneUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to make phone calls on this device')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error making call: $e')),
+      );
+    }
   }
 
   void _contactForSpecialService(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Redirecting to contact form...')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const ContactScreen()),
     );
   }
 }
@@ -330,13 +345,52 @@ class _ServiceAreaChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Chip(
-      label: Text(
-        label,
-        style: const TextStyle(fontSize: 14),
+    return InkWell(
+      onTap: () => _showAreaInfo(context, label),
+      borderRadius: BorderRadius.circular(16),
+      child: Chip(
+        label: Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Theme.of(context).textTheme.bodyMedium?.color,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+        side: BorderSide(color: AppColors.primary.withValues(alpha: 0.3)),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       ),
-      backgroundColor: AppColors.primary.withValues(alpha: 0.1),
-      side: BorderSide(color: Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)),
+    );
+  }
+
+  Future<void> _callLocation(BuildContext context) async {
+    final phoneUrl = Uri.parse('tel:${AppConstants.phoneNumber}');
+    try {
+      if (await canLaunchUrl(phoneUrl)) {
+        await launchUrl(phoneUrl);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unable to make phone calls on this device')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error making call: $e')),
+      );
+    }
+  }
+
+  void _showAreaInfo(BuildContext context, String area) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Service available in $area • Call for pricing & scheduling'),
+        duration: const Duration(seconds: 3),
+        action: SnackBarAction(
+          label: 'Call Now',
+          onPressed: () => _callLocation(context),
+        ),
+      ),
     );
   }
 }
@@ -386,7 +440,7 @@ class _InfoRow extends StatelessWidget {
                 description,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).textTheme.bodySmall?.color?.withValues(alpha: 0.7),
+                  color: Theme.of(context).textTheme.bodyMedium?.color,
                   height: 1.4,
                 ),
               ),

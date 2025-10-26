@@ -15,8 +15,12 @@ import 'package:kl_recycling_app/screens/contact_screen.dart';
 import 'package:kl_recycling_app/screens/educational_screen.dart';
 import 'package:kl_recycling_app/screens/gamification_screen.dart';
 import 'package:kl_recycling_app/screens/business_customer_management_screen.dart';
+import 'package:kl_recycling_app/screens/loyalty/loyalty_dashboard_screen.dart';
+import 'package:kl_recycling_app/providers/loyalty_provider.dart';
 import 'package:kl_recycling_app/services/notification_service.dart';
 import 'package:kl_recycling_app/services/ai/weight_prediction_service.dart' as ai_service;
+import 'package:kl_recycling_app/services/loyalty_service.dart';
+import 'package:kl_recycling_app/services/firebase_service.dart';
 import 'package:kl_recycling_app/widgets/common/custom_card.dart';
 import 'package:kl_recycling_app/widgets/common/photo_guidance_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -45,12 +49,17 @@ void main() async {
     debugPrint('Notification service initialization failed: $e');
   }
 
+  // Initialize services
+  final firebaseService = FirebaseService();
+  final loyaltyService = LoyaltyService(firebaseService);
+
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => CameraProvider()),
         ChangeNotifierProvider(create: (_) => BusinessCustomerProvider()),
         ChangeNotifierProvider(create: (_) => GamificationProvider()),
+        ChangeNotifierProvider(create: (_) => LoyaltyProvider(loyaltyService)),
       ],
       child: const KLRecyclingApp(),
     ),
@@ -304,12 +313,12 @@ class _CameraScreenState extends State<CameraScreen> with WidgetsBindingObserver
                       color: AppColors.primary,
                       shape: BoxShape.circle,
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.8),
+                        color: Colors.white.withValues(alpha: 0.8),
                         width: 4,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.3),
+                          color: Colors.black.withValues(alpha: 0.3),
                           blurRadius: 8,
                           offset: const Offset(0, 4),
                         ),
@@ -948,6 +957,7 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
     const BusinessCustomerManagementScreen(),
     const LocationsScreen(),
     const EducationalScreen(),
+    const LoyaltyDashboardScreen(),
     const GamificationScreen(),
   ];
 
@@ -1000,6 +1010,11 @@ class _MobileRecyclingAppState extends State<MobileRecyclingApp> {
               icon: Icon(Icons.school_outlined),
               activeIcon: Icon(Icons.school),
               label: 'Learn',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.loyalty_outlined),
+              activeIcon: Icon(Icons.loyalty),
+              label: 'Loyalty',
             ),
             BottomNavigationBarItem(
               icon: Icon(Icons.emoji_events_outlined),
@@ -1132,7 +1147,7 @@ class DashedBorderPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.6)
+      ..color = Colors.white.withValues(alpha: 0.6)
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
 
