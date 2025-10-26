@@ -1,1 +1,0 @@
- C:\\KL-Recycling\ App\\kl_recycling_app\\.dart_tool\\flutter_build\\2eccca166d44267ef79c220b380075ef\\native_assets.json: 
