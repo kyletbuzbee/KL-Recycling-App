@@ -33,6 +33,50 @@ migrate_working_dir/
 /build/
 /coverage/
 
+# Environment variables with sensitive data
+.env
+.env.local
+.env.production
+.env.staging
+
+# Secret keys and credentials
+secrets.json
+config/keys.json
+*.key
+*.pem
+*.p12
+
+# API keys and tokens
+.env.*.local
+apikey
+credentials.json
+service-account.json
+
+# Build artifacts (containing embedded secrets)
+*.so
+*.dill
+app.so
+app.dill
+<environment_details>
+<task_progress>
+- [x] Comprehensive UI/UX enhancement completed
+- [x] Material 3 theme system implemented
+- [x] Animated counter system created
+- [x] Bouncy card animations added
+- [x] Transparent scrolling AppBar implemented
+- [x] Critical bug fixes applied
+- [x] Screen-by-screen enhancements completed
+- [ ] Smart Haptic Feedback system (suggested next)
+- [ ] Animated Tier Progress bar implementation
+- [ ] Dynamic tier-based theming
+- [ ] Firebase backend enhancement (notifications, real-time features)
+- [ ] Engagement platform (push notifications, loyalty challenges)
+- [x] Add .env and secrets to .gitignore
+- [ ] Remove secret files from Git tracking
+- [ ] Clean embedded secrets from build artifacts
+- [ ] Successfully push changes to GitHub
+</task_progress>
+
 # Symbolication related
 app.*.symbols
 

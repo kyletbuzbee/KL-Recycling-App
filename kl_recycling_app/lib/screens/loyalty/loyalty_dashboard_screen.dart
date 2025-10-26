@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:kl_recycling_app/providers/loyalty_provider.dart';
 import 'package:kl_recycling_app/models/loyalty.dart';
@@ -179,7 +180,8 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () {
+                    onPressed: () async {
+                      await HapticFeedback.lightImpact();
                       Navigator.pushNamed(context, '/rewards');
                     },
                     icon: const Icon(Icons.card_giftcard),
@@ -238,12 +240,19 @@ class _LoyaltyDashboardScreenState extends State<LoyaltyDashboardScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-              valueColor: AlwaysStoppedAnimation<Color>(
-                Theme.of(context).primaryColor,
-              ),
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0.0, end: progress),
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.easeOutCubic,
+              builder: (context, animatedProgress, child) {
+                return LinearProgressIndicator(
+                  value: animatedProgress,
+                  backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Theme.of(context).primaryColor,
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 8),
             Text(
