@@ -10,6 +10,7 @@
 .pub/
 build/
 flutter_*.log
+.env.example
 
 # Android
 android/app/build/
@@ -145,3 +146,4 @@ coverage/
 *.sqlite
 *.sqlite3
 src/tmp/
+
