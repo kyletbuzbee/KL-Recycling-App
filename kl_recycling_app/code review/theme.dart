@@ -51,7 +51,7 @@ class AppGradients {
 
   // Soft gradient for overlays
   static LinearGradient softOverlay = LinearGradient(
-    colors: [Colors.white.withOpacity(0.1), Colors.white.withOpacity(0.05)],
+    colors: [Colors.white.withValues(alpha: 0.1), Colors.white.withValues(alpha: 0.05)],
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
   );
@@ -197,7 +197,7 @@ class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.largeBorder),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        shadowColor: AppColors.primary.withOpacity(0.1),
+        shadowColor: AppColors.primary.withValues(alpha: 0.1),
         color: AppColors.surface,
       ),
 
@@ -214,7 +214,7 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppBorderRadius.mediumBorder,
-          borderSide: BorderSide(color: AppColors.primaryLight.withOpacity(0.5)),
+          borderSide: BorderSide(color: AppColors.primaryLight.withValues(alpha: 0.5)),
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         hintStyle: TextStyle(

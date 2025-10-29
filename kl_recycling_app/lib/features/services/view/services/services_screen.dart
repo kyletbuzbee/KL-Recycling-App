@@ -1,0 +1,499 @@
+import 'package:flutter/material.dart';
+import 'package:kl_recycling_app/core/constants.dart';
+import 'package:kl_recycling_app/core/animations.dart';
+import 'package:kl_recycling_app/core/theme.dart';
+import 'package:kl_recycling_app/core/widgets/common/custom_card.dart';
+import 'package:kl_recycling_app/features/forms/view/forms/container_quote_form.dart';
+
+class ServicesScreen extends StatefulWidget {
+  const ServicesScreen({super.key});
+
+  @override
+  State<ServicesScreen> createState() => _ServicesScreenState();
+}
+
+class _ServicesScreenState extends State<ServicesScreen>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'Metal Recycling Services',
+          style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: AppColors.onPrimary,
+          ),
+        ),
+        flexibleSpace: Container(
+          decoration: BoxDecoration(
+            gradient: AppGradients.primary,
+          ),
+        ),
+        elevation: 0,
+        shadowColor: Colors.transparent,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(48),
+          child: Container(
+            decoration: BoxDecoration(
+              color: AppColors.surface,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
+              ),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(
+                  child: Text(
+                    'General',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    'Specialized',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
+                ),
+              ],
+              indicatorColor: AppColors.primary,
+              labelColor: AppColors.primary,
+              unselectedLabelColor: AppColors.onSurfaceSecondary,
+              indicatorSize: TabBarIndicatorSize.label,
+              indicatorWeight: 3,
+              labelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700),
+              unselectedLabelStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+            ),
+          ),
+        ),
+      ),
+      body: Container(
+        color: AppColors.surface,
+        child: TabBarView(
+          controller: _tabController,
+          children: const [
+            GeneralServicesTab(),
+            SpecializedServicesTab(),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class GeneralServicesTab extends StatelessWidget {
+  const GeneralServicesTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final generalServices = AppConstants.services.where((service) => service['category'] == 'general').toList();
+
+    return CustomScrollView(
+      slivers: [
+        SliverToBoxAdapter(
+          child: Container(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AppAnimations.fadeIn(
+                  Text(
+                    'General Recycling Services',
+                    style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: AppColors.onSurface,
+                    ),
+                  ),
+                  delay: const Duration(milliseconds: 100),
+                ),
+                const SizedBox(height: 12),
+                AppAnimations.slideUp(
+                  Text(
+                    'Flexible solutions for residential and commercial scrap metal recycling',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppColors.onSurfaceSecondary,
+                      height: 1.6,
+                    ),
+                  ),
+                  delay: const Duration(milliseconds: 150),
+                ),
+              ],
+            ),
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              childCount: generalServices.length,
+              (context, index) {
+                return AppAnimations.slideUp(
+                  ServiceCard(service: generalServices[index]),
+                  delay: Duration(milliseconds: 200 + (index * 100)),
+                );
+              },
+            ),
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 24)),
+      ],
+    );
+  }
+}
+
+class SpecializedServicesTab extends StatelessWidget {
+  const SpecializedServicesTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'Specialized Services',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: AppColors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Expert handling of specific materials and equipment',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: AppColors.onSurfaceSecondary,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 24),
+        ...AppConstants.services.where((service) => service['category'] != 'general' && service['category'] != 'equipment').map((service) => ServiceCard(service: service)),
+      ],
+    );
+  }
+}
+
+class EquipmentServicesTab extends StatelessWidget {
+  const EquipmentServicesTab({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Text(
+          'Equipment Rentals',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w900,
+            color: AppColors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Heavy equipment and containers for large-scale projects',
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+            color: AppColors.onSurfaceSecondary,
+            height: 1.6,
+          ),
+        ),
+        const SizedBox(height: 24),
+        ...AppConstants.services.where((service) => service['category'] == 'equipment').map((service) => ServiceCard(service: service)),
+      ],
+    );
+  }
+}
+
+class ServiceCard extends StatelessWidget {
+  final Map<String, dynamic> service;
+  final Duration animationDelay;
+
+  const ServiceCard({
+    super.key,
+    required this.service,
+    this.animationDelay = Duration.zero
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomCard(
+      animationDelay: animationDelay,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Service Image Banner
+          AppAnimations.fadeIn(
+            ClipRRect(
+              borderRadius: AppBorderRadius.mediumBorder,
+              child: Container(
+                height: 160,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                      Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: AppBorderRadius.mediumBorder,
+                  border: Border.all(
+                    color: Theme.of(context).primaryColor.withValues(alpha: 0.2),
+                    width: 1,
+                  ),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface.withValues(alpha: 0.9),
+                            borderRadius: AppBorderRadius.largeBorder,
+                            border: Border.all(
+                              color: AppColors.primary.withValues(alpha: 0.3),
+                              width: 2,
+                            ),
+                          ),
+                        child: _buildServiceIcon(service['id'].toString(), context),
+                        ),
+                      const Spacer(),
+                      Text(
+                        service['name'].toString(),
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.onSurface,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            delay: const Duration(milliseconds: 100),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Service Description
+          AppAnimations.slideUp(
+            Text(
+              service['description'].toString(),
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.onSurfaceSecondary,
+                height: 1.6,
+              ),
+            ),
+            delay: const Duration(milliseconds: 200),
+          ),
+
+          const SizedBox(height: 20),
+
+          // Features list
+          if (service['features'] != null) ...[
+            AppAnimations.fadeIn(
+              Text(
+                'Features:',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.onSurface,
+                ),
+              ),
+              delay: const Duration(milliseconds: 300),
+            ),
+            const SizedBox(height: 12),
+            AppAnimations.slideUp(
+              Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: (service['features'] as List<dynamic>).asMap().entries.map((entry) =>
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                margin: const EdgeInsets.only(top: 4, right: 12),
+                                width: 6,
+                                height: 6,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).primaryColor,
+                                  borderRadius: BorderRadius.circular(3),
+                                ),
+                              ),
+                              Expanded(
+                                child: Text(
+                                  entry.value.toString(),
+                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                    color: AppColors.onSurfaceSecondary,
+                                    height: 1.5,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ).toList(),
+              ),
+              delay: const Duration(milliseconds: 350),
+            ),
+          ],
+
+          // Sizes list (for container services)
+          if (service['sizes'] != null) ...[
+            const SizedBox(height: 16),
+            AppAnimations.fadeIn(
+              Text(
+                'Available Sizes:',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.onSurface,
+                ),
+              ),
+              delay: const Duration(milliseconds: 400),
+            ),
+            const SizedBox(height: 12),
+            AppAnimations.scaleIn(
+              Wrap(
+                spacing: 12,
+                runSpacing: 12,
+                children: (service['sizes'] as List<dynamic>).map((size) =>
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).primaryColor.withValues(alpha: 0.1),
+                      borderRadius: AppBorderRadius.smallBorder,
+                      border: Border.all(
+                        color: Theme.of(context).primaryColor.withValues(alpha: 0.3),
+                        width: 1,
+                      ),
+                    ),
+                    child: Text(
+                      size.toString(),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ),
+                  ),
+                ).toList(),
+              ),
+              delay: const Duration(milliseconds: 450),
+            ),
+          ],
+
+          const SizedBox(height: 24),
+
+          // Action Button
+          AppAnimations.bounceIn(
+            SizedBox(
+              width: double.infinity,
+              child: Container(
+                decoration: BoxDecoration(
+                  gradient: AppGradients.buttonGlow,
+                  borderRadius: AppBorderRadius.mediumBorder,
+                  boxShadow: [AppShadows.medium],
+                ),
+                child: ElevatedButton(
+                  onPressed: () => _handleServiceAction(context, service),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: AppColors.onPrimary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    elevation: 0,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppBorderRadius.mediumBorder,
+                    ),
+                  ),
+                  child: Text(
+                    service['cta']?.toString() ?? 'Learn More',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            delay: const Duration(milliseconds: 500),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildServiceIcon(String serviceId, BuildContext context) {
+    // Use custom PNG icons from assets/icons directory
+    return Image.asset(
+      'assets/icons/${_getServiceIconPath(serviceId)}',
+      width: 48,
+      height: 48,
+      color: Theme.of(context).primaryColor,
+      fit: BoxFit.contain,
+    );
+  }
+
+  String _getServiceIconPath(String serviceId) {
+    switch (serviceId) {
+      case 'mobile-car-crushing':
+        return 'car_crusher_mobile.png';
+      case 'oil-gas-demo':
+        return 'construction_debris.png';
+      case 'roll-off-containers':
+        return 'container_roll_off.png';
+      case 'public-drop-off':
+        return 'location_pin_service.png';
+      default:
+        return 'services_build.png'; // Default service icon
+    }
+  }
+
+  void _handleServiceAction(BuildContext context, Map<String, dynamic> service) {
+    // Handle different service actions based on service type
+    final serviceName = service['name'].toString();
+    final serviceId = service['id'].toString();
+
+    if (serviceId == 'roll-off-containers') {
+      // Navigate to container quote form
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ContainerQuoteForm(containerType: serviceName),
+        ),
+      );
+    } else if (serviceId == 'mobile-car-crushing' || serviceId == 'oil-gas-demo') {
+      // Contact for service request or quote
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Call us to schedule $serviceName - ${AppConstants.phoneNumber}')),
+      );
+    } else if (serviceId == 'public-drop-off') {
+      // Navigate to locations (coming soon)
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Location information coming soon!')),
+      );
+    } else {
+      // Fallback for other services
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Service inquiry for $serviceName coming soon!')),
+      );
+    }
+  }
+}

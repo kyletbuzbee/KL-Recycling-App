@@ -1,0 +1,202 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    function isDriver() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'driver';
+    }
+
+    function isBusiness() {
+      return isAuthenticated() &&
+             get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'business';
+    }
+
+    function hasValidData() {
+      return request.resource.data.keys().hasAll(['timestamp', 'createdBy']) &&
+             request.resource.data.timestamp is timestamp &&
+             request.resource.data.createdBy == request.auth.uid;
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      // Users can read and write their own data
+      allow read, write: if isOwner(userId);
+
+      // Admins can read all user data
+      allow read: if isAdmin();
+
+      // Additional validation for user creation
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == userId &&
+                       request.resource.data.keys().hasAll(['email', 'role', 'createdAt']) &&
+                       request.resource.data.role in ['customer', 'business', 'driver', 'admin'];
+    }
+
+    // Collections (recycling submissions)
+    match /collections/{collectionId} {
+      // Users can read/write their own collections
+      allow read, write: if isOwner(resource.data.userId);
+
+      // Businesses can read collections submitted to them
+      allow read: if isBusiness() &&
+                     exists(/databases/$(database)/documents/businesses/$(request.auth.uid)/collections/$collectionId);
+
+      // Drivers can read collections they need to pick up
+      allow read: if isDriver() &&
+                     resource.data.status in ['scheduled', 'in_transit'];
+
+      // Allow creation with proper validation
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid &&
+                       request.resource.data.keys().hasAll(['userId', 'timestamp', 'status']) &&
+                       request.resource.data.status == 'pending';
+
+      // Update rules (for status changes)
+      allow update: if isAuthenticated() &&
+                       (isOwner(resource.data.userId) ||
+                        isBusiness() && resource.data.businessId == request.auth.uid ||
+                        isDriver() && resource.data.driverId == request.auth.uid);
+    }
+
+    // Challenges Collection
+    match /challenges/{challengeId} {
+      // Everyone can read challenges
+      allow read: if true;
+
+      // Only admins can create/update challenges
+      allow create, update: if isAdmin();
+
+      // Delete is restricted to admins
+      allow delete: if isAdmin();
+    }
+
+    // User Challenges (progress tracking)
+    match /user_challenges/{userId} {
+      allow read, write: if isOwner(userId);
+      allow read: if isAdmin();
+    }
+
+    // Loyalty Programs
+    match /loyalty_programs/{programId} {
+      // Everyone can read
+      allow read: if true;
+
+      // Only admins can modify
+      allow write: if isAdmin();
+    }
+
+    // User Loyalty Status
+    match /user_loyalty/{userId} {
+      allow read, write: if isOwner(userId);
+      allow read: if isAdmin();
+    }
+
+    // Driver Locations (for real-time tracking)
+    match /driver_locations/{driverId} {
+      // Drivers can update their own location
+      allow read, write: if isOwner(driverId) && isDriver();
+
+      // Users can read driver locations for assigned collections
+      allow read: if isAuthenticated() && !isDriver();
+
+      // Businesses can read driver locations
+      allow read: if isBusiness();
+    }
+
+    // Business Management
+    match /businesses/{businessId} {
+      // Business owners can read/write their data
+      allow read, write: if isOwner(businessId) && isBusiness();
+
+      // Admins have full access
+      allow read, write: if isAdmin();
+
+      // Users can read basic business info
+      allow read: if !isBusiness() && !isDriver();
+    }
+
+    // Analytics and Reports (admin only)
+    match /analytics/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // System configuration (admin only)
+    match /config/{document=**} {
+      allow read, write: if isAdmin();
+    }
+
+    // Batch processes
+    match /batch_processes/{batchId} {
+      // Permit read for the user who initiated the batch
+      allow read: if isOwner(resource.data.userId);
+
+      // Allow create for authenticated users
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // Admins can monitor all batches
+      allow read: if isAdmin();
+    }
+
+    // Training data and AI models (restricted)
+    match /ai_models/{document=**} {
+      // Only admins for AI model management
+      allow read, write: if isAdmin();
+    }
+
+    match /training_data/{document=**} {
+      // Users can create training data from their collections
+      allow create: if isAuthenticated() &&
+                       request.resource.data.userId == request.auth.uid;
+
+      // Admins can read all training data
+      allow read: if isAdmin();
+    }
+
+    // Emergency collections (special permissions)
+    match /emergency_collections/{collectionId} {
+      // Require authentication even for emergency creation - add verified user validation
+      allow create: if isAuthenticated() &&
+                       request.auth.uid == request.resource.data.userId &&
+                       request.resource.data.urgent == true &&
+                       request.resource.data.keys().hasAll(['userId', 'urgent', 'timestamp']);
+
+      // Standard permissions apply after creation
+      allow read, write: if isAuthenticated() &&
+                            (isOwner(resource.data.userId) ||
+                             isBusiness() ||
+                             isDriver() ||
+                             isAdmin());
+    }
+
+    // Webhooks and integrations (admin only)
+    match /webhooks/{webhookId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Notification settings
+    match /notification_settings/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+
+    // Default deny rule for any unmatched paths
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
